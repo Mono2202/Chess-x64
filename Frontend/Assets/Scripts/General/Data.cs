@@ -10,6 +10,12 @@ public class Data : MonoBehaviour
 
     // Constants:
     public const int LOGIN_SCENE_INDEX = 1;
+    public const int REGISTER_SCENE_COUNT = 2;
+    public const int MENU_SCENE_COUNT = 3;
+    public const int SEARCHING_SCENE_COUNT = 4;
+    public const int GAME_SCENE_COUNT = 5;
+
+    public const float DELAY_TIME = 0.5f;
 
     // Methods:
     private void Awake()

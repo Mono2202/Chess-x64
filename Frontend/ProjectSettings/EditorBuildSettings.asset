@@ -14,4 +14,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Register.unity
     guid: 510ad9da5b71b7e41a1eb93d8700f19e
+  - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: ea8f8a360b9ac334dbb0298dcecc573f
+  - enabled: 1
+    path: Assets/Scenes/Searching.unity
+    guid: 6a4ad724eac5f5e4c9aa5a14f0c4d1d8
+  - enabled: 1
+    path: Assets/Scenes/Game.unity
+    guid: b7a94d32991ac7a44a936c971da47e68
   m_configObjects: {}

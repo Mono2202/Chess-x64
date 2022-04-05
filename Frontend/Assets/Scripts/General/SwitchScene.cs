@@ -7,4 +7,9 @@ public class SwitchScene : MonoBehaviour
     {
         SceneManager.LoadScene(index);
     }
+
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
 }

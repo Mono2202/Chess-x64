@@ -673,6 +673,8 @@ GameObject:
   - component: {fileID: 758936905}
   - component: {fileID: 758936904}
   - component: {fileID: 758936903}
+  - component: {fileID: 758936907}
+  - component: {fileID: 758936908}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -770,6 +772,34 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &758936907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 758936902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a86f30ccaaa5fc444a71a976e0df5045, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &758936908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 758936902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e1842ce30ac0df4fb949cbec790e1aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  usernameInput: {fileID: 1541400490}
+  passwordInput: {fileID: 586398444}
+  emailInput: {fileID: 860072202}
+  signUpButton: {fileID: 1922553197}
 --- !u!1 &763786842
 GameObject:
   m_ObjectHideFlags: 0
@@ -1818,7 +1848,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.3764706, g: 0.3764706, b: 0.3764706, a: 1}
     m_PressedColor: {r: 0.29411766, g: 0.29411766, b: 0.29411766, a: 1}
     m_SelectedColor: {r: 0.25490198, g: 0.25490198, b: 0.25490198, a: 1}
-    m_DisabledColor: {r: 0.21960786, g: 0.21960786, b: 0.21960786, a: 0.5019608}
+    m_DisabledColor: {r: 0.21960786, g: 0.21960786, b: 0.21960786, a: 0.078431375}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -1836,7 +1866,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1922553198}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 758936908}
+        m_TargetAssemblyTypeName: Register, Assembly-CSharp
+        m_MethodName: SendRegisterMessage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1922553198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1887,7 +1929,6 @@ GameObject:
   - component: {fileID: 2027209130}
   - component: {fileID: 2027209129}
   - component: {fileID: 2027209128}
-  - component: {fileID: 2027209131}
   m_Layer: 5
   m_Name: ReturnButton
   m_TagString: Untagged
@@ -1959,7 +2000,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2027209131}
+      - m_Target: {fileID: 758936907}
         m_TargetAssemblyTypeName: SwitchScene, Assembly-CSharp
         m_MethodName: SwitchSceneByIndex
         m_Mode: 3
@@ -2009,18 +2050,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2027209126}
   m_CullTransparentMesh: 1
---- !u!114 &2027209131
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2027209126}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a86f30ccaaa5fc444a71a976e0df5045, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2094544812
 GameObject:
   m_ObjectHideFlags: 0
