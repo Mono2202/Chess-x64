@@ -19,8 +19,8 @@ public class Position
     /*
      * Checks if a board position is out of bounds
      * Input : position - the board position
-     * Output: true - the position is out of bounds
-     *         false - otherwise
+     * Output: true     - the position is out of bounds
+     *         false    - otherwise
      */
     public static bool IsOutOfBounds(int row, int col)
     {
@@ -28,6 +28,17 @@ public class Position
             col < 0 || col >= Board.BOARD_SIZE;
     }
 
+    /*
+     * Converts a move to a notation
+     * Input : type  - the piece's type
+     *         src   - the source position
+     *         dest  - the dest position
+     *         taken - a piece was taken
+     *         board - the chess board
+     *         
+     * Output: true  - the position is out of bounds
+     *         false - otherwise
+     */
     public static string MoveToNotation(char type, Position src, Position dst, bool taken, Piece[,] board)
     {
         return Char.ToUpper(type) + ColToLetter(src.col) + RowToNumber(src.row) + /*(taken ? "x" : "") +*/
@@ -51,6 +62,6 @@ public class Position
     }
     private static string RowToNumber(int row)
     {
-        return ((char)(row + 1)).ToString();
+        return ((char)(row + 1 + '0')).ToString();
     }
 }

@@ -67,7 +67,7 @@ public class Pawn : Piece
             moves.Add(Position.MoveToNotation(type, position, new Position(position.row + moveDirection, position.col - moveDirection), true, board),
                 new Position(position.row + moveDirection, position.col - moveDirection));
         }
-        Debug.Log(currentMove);
+        
         // Condition: can en passant
         if (position.row == enPassantRow &&
             Math.Abs(currentMove[2] - currentMove[4]) == 2 &&

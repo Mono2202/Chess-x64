@@ -116,6 +116,7 @@ public class Board : MonoBehaviour
         switch (Char.ToUpper(type))
         {
             case 'P': return new Pawn(type, position);
+            case 'N': return new Knight(type, position);
             default: return null;
         }
     }
