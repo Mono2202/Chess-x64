@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class Board : MonoBehaviour
@@ -9,7 +12,11 @@ public class Board : MonoBehaviour
     public GameObject cell;
     public Transform canvas;
     public List<Sprite> chessSprites = new List<Sprite>();
-    [HideInInspector] public GameObject[,] boardArr = new GameObject[BOARD_SIZE, BOARD_SIZE];
+    [HideInInspector] public GameObject[,] guiBoardArr = new GameObject[BOARD_SIZE, BOARD_SIZE];
+    [HideInInspector] public Piece[,] boardArr = new Piece[BOARD_SIZE, BOARD_SIZE];
+    [HideInInspector] public string currentMove;
+    [HideInInspector] public Position selectedPiece;
+    [HideInInspector] public Position selectedDest;
 
     // Constants:
     public const int BOARD_SIZE = 8;
@@ -62,42 +69,97 @@ public class Board : MonoBehaviour
         {
             for (int j = 0; j < BOARD_SIZE; j++)
             {
-                // Creating the cell game object:
-                GameObject currentCell = Instantiate(cell);
+                // Adding the chess piece object to the array:
+                boardArr[i, j] = CreatePiece(INITIAL_BOARD[i, j], new Position(i, j));
 
-                // Changing the cell's color: TODO
-                //currentCell.GetComponent<Image>().color = (((i + j) % 2 == 0) /*== Data.instance.isWhite*/) ? new Color32(65, 65, 65, 255) : new Color32(8, 171, 0, 255);
-                currentCell.GetComponent<Image>().color = (((i + j) % 2 == 0) /*== Data.instance.isWhite*/) ? new Color32(255, 255, 255, 255) : new Color32(65, 65, 65, 255);
-
-                // Changing the cell's parent:
-                currentCell.transform.SetParent(canvas, false);
-
-                // Positioning the cell:
-                currentCell.transform.localPosition = new Vector3(-350 + j * 100, 350 - i * 100, 0);
-
-                // Condition: piece in current cell
-                if (INITIAL_BOARD[i, j] != '#')
-                {
-                    // Creating the chess sprite game object:
-                    GameObject chessSprite = new GameObject();
-                    chessSprite.AddComponent<Image>();
-
-                    // Assigning the sprite to the game object:
-                    chessSprite.GetComponent<Image>().sprite = chessSprites[charToSpriteIndex[INITIAL_BOARD[i, j]]];
-
-                    // Assigning the sprite to the cell:
-                    chessSprite.transform.SetParent(currentCell.transform, false);
-                }
-                
-                // Adding the cell to the board array:
-                boardArr[i, j] = currentCell;
+                // Adding the cell to the GUI board array:
+                guiBoardArr[i, j] = CreateCell(i, j, INITIAL_BOARD[i, j]);
             }
         }
+
+        // TODO: GET THE CURRENT MOVE
+        currentMove = "*****";
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        //print(selectedDest.row + " " + selectedDest.col);
+        // Condition: move was played
+        if (selectedPiece != null && selectedDest != null)
+        {
+            if (boardArr[selectedPiece.row, selectedPiece.col].GetLegalMoves(boardArr, currentMove).Any(move => (move.Value != null && move.Value.row == selectedDest.row && move.Value.col == selectedDest.col)))
+            {
+                // Changing the GUI:
+                Destroy(guiBoardArr[selectedDest.row, selectedDest.col]);
+                guiBoardArr[selectedDest.row, selectedDest.col] = CreateCell(selectedDest.row, selectedDest.col,
+                    boardArr[selectedPiece.row, selectedPiece.col].type);
+                Destroy(guiBoardArr[selectedPiece.row, selectedPiece.col]);
+                guiBoardArr[selectedPiece.row, selectedPiece.col] = CreateCell(selectedPiece.row, selectedPiece.col, '#');
+
+                // Changing the board array:
+                boardArr[selectedDest.row, selectedDest.col] = boardArr[selectedPiece.row, selectedPiece.col];
+                boardArr[selectedDest.row, selectedDest.col].position = new Position(selectedDest.row, selectedDest.col);
+                boardArr[selectedPiece.row, selectedPiece.col] = null;
+            }
+            
+            // Resetting the properties:
+            selectedPiece = null;
+            selectedDest = null;
+        }
+
+        // TODO: SEND SUBMIT MOVE MESSAGE TO SERVER
+    }
+
+    private Piece CreatePiece(char type, Position position)
+    {
+        switch (Char.ToUpper(type))
+        {
+            case 'P': return new Pawn(type, position);
+            default: return null;
+        }
+    }
+
+    private GameObject CreateCell(int i, int j, char type)
+    {
+        // Creating the cell game object:
+        GameObject currentCell = Instantiate(cell);
+
+        // Changing the cell's color: TODO
+        //currentCell.GetComponent<Image>().color = (((i + j) % 2 == 0) /*== Data.instance.isWhite*/) ? new Color32(65, 65, 65, 255) : new Color32(8, 171, 0, 255);
+        currentCell.GetComponent<Image>().color = (((i + j) % 2 == 0) /*== Data.instance.isWhite*/) ? new Color32(255, 255, 255, 255) : new Color32(65, 65, 65, 255);
+
+        // Changing the cell's parent:
+        currentCell.transform.SetParent(canvas, false);
+
+        // Positioning the cell:
+        currentCell.transform.localPosition = new Vector3(-350 + j * 100, 350 - i * 100, 0);
+
+        // Creating the chess sprite game object:
+        GameObject chessSprite = new GameObject();
+        chessSprite.AddComponent<Image>();
+
+        // Condition: piece in current cell
+        if (type != '#')
+        {
+            // Assigning the sprite to the game object:
+            chessSprite.GetComponent<Image>().sprite = chessSprites[charToSpriteIndex[type]];
+        }
+
+        else
+        {
+            // Hiding the empty sprite:
+            chessSprite.GetComponent<Image>().enabled = false;
+        }
+
+        // Assigning the sprite to the cell:
+        chessSprite.transform.SetParent(currentCell.transform, false);
+
+        // Adding option to click on cell:
+        currentCell.GetComponent<CellClick>().row = i;
+        currentCell.GetComponent<CellClick>().col = j;
+        currentCell.GetComponent<CellClick>().boardScript = this;
+
+        return currentCell;
     }
 }
