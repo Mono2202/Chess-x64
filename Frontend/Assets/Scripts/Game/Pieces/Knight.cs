@@ -40,7 +40,6 @@ public class Knight : Piece
                     // Condition: can move to empty square
                     else if (board[position.row + KNIGHT_MOVES[i], position.col + KNIGHT_MOVES[j]] == null)
                     {
-                        Debug.Log(KNIGHT_MOVES[i] + " " + KNIGHT_MOVES[j]);
                         moves.Add(Position.MoveToNotation(type, position, new Position(position.row + KNIGHT_MOVES[i], position.col + KNIGHT_MOVES[j]), false, board),
                             new Position(position.row + KNIGHT_MOVES[i], position.col + KNIGHT_MOVES[j]));
                     }

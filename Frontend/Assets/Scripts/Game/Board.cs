@@ -117,6 +117,7 @@ public class Board : MonoBehaviour
         {
             case 'P': return new Pawn(type, position);
             case 'N': return new Knight(type, position);
+            case 'B': return new Bishop(type, position);
             default: return null;
         }
     }
