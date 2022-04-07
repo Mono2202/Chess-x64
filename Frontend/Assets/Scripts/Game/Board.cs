@@ -118,6 +118,8 @@ public class Board : MonoBehaviour
             case 'P': return new Pawn(type, position);
             case 'N': return new Knight(type, position);
             case 'B': return new Bishop(type, position);
+            case 'R': return new Rook(type, position);
+            case 'Q': return new Queen(type, position);
             default: return null;
         }
     }
