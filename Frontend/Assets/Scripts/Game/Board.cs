@@ -120,6 +120,7 @@ public class Board : MonoBehaviour
             case 'B': return new Bishop(type, position);
             case 'R': return new Rook(type, position);
             case 'Q': return new Queen(type, position);
+            case 'K': return new King(type, position);
             default: return null;
         }
     }
