@@ -9,6 +9,7 @@ using UnityEngine.UI;
 public class Board : MonoBehaviour
 {
     // Fields:
+    private Communicator communicator;
     public GameObject cell;
     public Transform canvas;
     public List<Sprite> chessSprites = new List<Sprite>();
@@ -17,6 +18,9 @@ public class Board : MonoBehaviour
     [HideInInspector] public string currentMove;
     [HideInInspector] public Position selectedPiece;
     [HideInInspector] public Position selectedDest;
+    [HideInInspector] public bool isPlayerWhite;
+    [HideInInspector] public bool isCurrentPlayerWhite;
+    [HideInInspector] public string playerMove;
 
     // Constants:
     public const int BOARD_SIZE = 8;
@@ -64,6 +68,22 @@ public class Board : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Inits:
+        communicator = Data.instance.communicator;
+
+        // Sending the get room state request:
+        communicator.Write(Serializer.SerializeRequest<GetRoomStateRequest>(new GetRoomStateRequest { }, Serializer.GET_ROOM_STATE_REQUEST));
+
+        // Deserializing the response:
+        GetRoomStateResponse response = Deserializer.DeserializeResponse<GetRoomStateResponse>(communicator.Read());
+        string[] startingColors = response.CurrentMove.Split(new string[] { "&&&" }, StringSplitOptions.None);
+
+        // Setting the board's fields:
+        isPlayerWhite = (startingColors[0] == Data.instance.username) ? true : false;
+        currentMove = response.CurrentMove;
+        isCurrentPlayerWhite = true;
+        playerMove = "";
+
         // Creating the chess board:
         for (int i = 0; i < BOARD_SIZE; i++)
         {
@@ -77,30 +97,29 @@ public class Board : MonoBehaviour
             }
         }
 
-        // TODO: GET THE CURRENT MOVE
-        currentMove = "*****";
+        // Starting communication with server about game state:
+        StartCoroutine(GetGameState());
     }
 
     // Update is called once per frame
     void Update()
     {
-        //print(selectedDest.row + " " + selectedDest.col);
         // Condition: move was played
-        if (selectedPiece != null && selectedDest != null)
+        if (selectedPiece != null && selectedDest != null && playerMove == "")
         {
             if (boardArr[selectedPiece.row, selectedPiece.col].GetLegalMoves(boardArr, currentMove).Any(move => (move.Value != null && move.Value.row == selectedDest.row && move.Value.col == selectedDest.col)))
             {
-                // Changing the GUI:
-                Destroy(guiBoardArr[selectedDest.row, selectedDest.col]);
-                guiBoardArr[selectedDest.row, selectedDest.col] = CreateCell(selectedDest.row, selectedDest.col,
-                    boardArr[selectedPiece.row, selectedPiece.col].type);
-                Destroy(guiBoardArr[selectedPiece.row, selectedPiece.col]);
-                guiBoardArr[selectedPiece.row, selectedPiece.col] = CreateCell(selectedPiece.row, selectedPiece.col, '#');
+                // Changing the player move:
+                playerMove = Position.MoveToNotation(boardArr[selectedPiece.row, selectedPiece.col].type, selectedPiece, selectedDest, false, boardArr);
 
-                // Changing the board array:
-                boardArr[selectedDest.row, selectedDest.col] = boardArr[selectedPiece.row, selectedPiece.col];
-                boardArr[selectedDest.row, selectedDest.col].position = new Position(selectedDest.row, selectedDest.col);
-                boardArr[selectedPiece.row, selectedPiece.col] = null;
+                // Updating the current move:
+                currentMove = playerMove;
+
+                // Switching players:
+                isCurrentPlayerWhite = !isCurrentPlayerWhite;
+
+                // Updating the board:
+                UpdateBoard(selectedPiece, selectedDest);
             }
             
             // Resetting the properties:
@@ -109,6 +128,55 @@ public class Board : MonoBehaviour
         }
 
         // TODO: SEND SUBMIT MOVE MESSAGE TO SERVER
+
+    }
+
+    private IEnumerator GetGameState()
+    {
+        while (true)
+        {
+            // Waiting for half a second:
+            yield return new WaitForSeconds(Data.DELAY_TIME);
+            
+            // Current player has played:
+            if (playerMove != "")
+            {
+                // Sending the submit move request:
+                communicator.Write(Serializer.SerializeRequest<SubmitMoveRequest>(new SubmitMoveRequest { Move = playerMove }, Serializer.SUBMIT_MOVE_REQUEST));
+                
+                // Reading the response:
+                string msg = communicator.Read();
+
+                Debug.Log(playerMove + " " + currentMove);
+
+                // Resetting the player's move:
+                playerMove = "";
+            }
+
+            else
+            {
+                // Sending the get room state request:
+                communicator.Write(Serializer.SerializeRequest<GetRoomStateRequest>(new GetRoomStateRequest { }, Serializer.GET_ROOM_STATE_REQUEST));
+
+                // Deserializing the response:
+                GetRoomStateResponse response = Deserializer.DeserializeResponse<GetRoomStateResponse>(communicator.Read());
+
+                print("STATE: " + currentMove + " " + response.CurrentMove);
+                // Condition: a move has been played
+                if (response.CurrentMove != currentMove)
+                {
+                    // Switching players:
+                    isCurrentPlayerWhite = !isCurrentPlayerWhite;
+
+                    // Updating the current move:
+                    currentMove = response.CurrentMove;
+
+                    // Updating the board:
+                    UpdateBoard(new Position(currentMove[2] - '1', currentMove[1] - 'a'),
+                        new Position(currentMove[4] - '1', currentMove[3] - 'a'));
+                }
+            }
+        }
     }
 
     private Piece CreatePiece(char type, Position position)
@@ -166,5 +234,22 @@ public class Board : MonoBehaviour
         currentCell.GetComponent<CellClick>().boardScript = this;
 
         return currentCell;
+    }
+
+    private void UpdateBoard(Position src, Position dst)
+    {
+        // Changing the GUI:
+        print("DST: " + dst.row + " " + dst.col);
+        print("SRC: " + src.row + " " + src.col);
+        Destroy(guiBoardArr[dst.row, dst.col]);
+        guiBoardArr[dst.row, dst.col] = CreateCell(dst.row, dst.col,
+            boardArr[src.row, src.col].type);
+        Destroy(guiBoardArr[src.row, src.col]);
+        guiBoardArr[src.row, src.col] = CreateCell(src.row, src.col, '#');
+
+        // Changing the board array:
+        boardArr[dst.row, dst.col] = boardArr[src.row, src.col];
+        boardArr[dst.row, dst.col].position = new Position(dst.row, dst.col);
+        boardArr[src.row, src.col] = null;
     }
 }

@@ -22,7 +22,9 @@ public class CellClick : MonoBehaviour
         }
 
         // Showing legal moves:
-        if (boardScript.boardArr[row, col] != null) // TODO: CHECK IF YOUR PIECE
+        if (boardScript.isCurrentPlayerWhite == boardScript.isPlayerWhite &&
+            boardScript.boardArr[row, col] != null &&
+            boardScript.boardArr[row, col].isWhite == boardScript.isPlayerWhite)
         {
             Dictionary<string, Position> moves = boardScript.boardArr[row, col].GetLegalMoves(boardScript.boardArr, boardScript.currentMove);
             foreach (KeyValuePair<string, Position> move in moves)

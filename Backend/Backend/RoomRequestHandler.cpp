@@ -1,5 +1,6 @@
 #include "RoomRequestHandler.h"
 #include "RequestHandlerFactory.h"
+#include <iostream>
 
 // C'tor:
 
@@ -79,9 +80,10 @@ RequestResult RoomRequestHandler::leaveRoom(RequestInfo request)
 {
     // Inits:
     RequestResult result;
+    m_room = *(m_roomManager.getRoom(m_room.getRoomData().id));
 
     // Removing the current user from the room:
-    m_roomManager.getRoom(m_room.getRoomData().id)->removeUser(m_user);
+    m_room.removeUser(m_user);
     
     // Condition: there is a user in the room
     if (m_room.getAllUsers().size()) {
@@ -114,9 +116,13 @@ RequestResult RoomRequestHandler::submitMove(RequestInfo request)
     // Inits:
     RequestResult result;
 
+    std::cout << "before: " << m_roomManager.getRoom(m_room.getRoomData().id)->getRoomData().currentMove << " %%% " << JsonRequestPacketDeserializer::deserializeSubmitMoveRequest(request.buffer).move;
+
     // Creating Response:
     m_roomManager.getRoom(m_room.getRoomData().id)->setCurrentMove(JsonRequestPacketDeserializer::deserializeSubmitMoveRequest(request.buffer).move);
     SubmitMoveResponse response = { SUCCESS_STATUS };
+
+    std::cout << "updated: " << m_roomManager.getRoom(m_room.getRoomData().id)->getRoomData().currentMove;
 
     // TODO: FINISH GAME, ADD STATS
 

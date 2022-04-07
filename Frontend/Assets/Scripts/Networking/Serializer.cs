@@ -55,7 +55,10 @@ class GetRoomStateRequest { }
 class LeaveRoomRequest { }
 
 // SubmitMoveRequest Class:
-class SubmitMoveRequest { }
+class SubmitMoveRequest 
+{ 
+    public string Move { get; set; }
+}
 
 static class Serializer
 {

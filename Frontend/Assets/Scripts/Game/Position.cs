@@ -62,6 +62,6 @@ public class Position
     }
     private static string RowToNumber(int row)
     {
-        return ((char)(row + 1 + '0')).ToString();
+        return ((char)(row + '1')).ToString();
     }
 }

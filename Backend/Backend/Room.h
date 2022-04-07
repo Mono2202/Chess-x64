@@ -3,6 +3,7 @@
 // Includes:
 #include "LoggedUser.h"
 #include <vector>
+#include <algorithm>
 
 // Defines:
 #define MAX_PLAYERS 2

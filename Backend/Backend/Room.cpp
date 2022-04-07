@@ -14,7 +14,23 @@ void Room::setIsActive(unsigned int flag)
 
 void Room::setCurrentMove(string move)
 {
-	this->m_metadata.currentMove = move;
+	// Condition: choosing players
+	if (move == "random") {
+		// Inits:
+		vector<string> users = this->getAllUsers();
+		int i = 0;
+
+		// Shuffling the users vector: TODO: CHECK IF ACTUALLY RANDOM
+		std::random_shuffle(users.begin(), users.end());
+
+		// Choosing the starting color for each player
+		//this->m_metadata.currentMove = users[0] + "&&&W&&&" + users[1] + "&&&B";	
+		this->m_metadata.currentMove = "Ron&&&W&&&Yoni&&&B";	
+	}
+
+	else {
+		this->m_metadata.currentMove = move;
+	}
 }
 
 /*

@@ -164,6 +164,7 @@ RequestResult MenuRequestHandler::joinRoom(RequestInfo request)
     JoinRoomResponse response;
     m_roomManager.getRoom(joinRequest.roomID)->addUser(m_user);
     m_roomManager.getRoom(joinRequest.roomID)->setIsActive(true);
+    m_roomManager.getRoom(joinRequest.roomID)->setCurrentMove("random"); // TODO: SET RANDOMALLY
     response.status = SUCCESS_STATUS;
 
     // Creating Result:
