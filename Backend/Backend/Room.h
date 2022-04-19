@@ -33,6 +33,7 @@ public:
 
 	// Methods:
 	void setIsActive(unsigned int flag);
+	bool getIsActive() const;
 	void setCurrentMove(string move);
 	void addUser(LoggedUser user);
 	void removeUser(LoggedUser user);

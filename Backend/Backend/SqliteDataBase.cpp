@@ -34,7 +34,7 @@ bool SqliteDataBase::open()
 	// Inits:
 	string query = "CREATE TABLE USERS(username TEXT NOT NULL PRIMARY KEY, password TEXT NOT NULL, email TEXT NOT NULL);\n\
 					CREATE TABLE STATISTICS(username TEXT NOT NULL PRIMARY KEY,\
-					totalGames INTEGER NOT NULL, gamesWon INTEGER NOT NULL, gamesLost INTEGER NOT NULL);";
+					totalGames INTEGER NOT NULL, gamesWon INTEGER NOT NULL, gamesLost INTEGER NOT NULL, gamesTied INTEGER NOT NULL);";
 	string dbFile = "ChessDB.db";
 	char* errMsg = NULL;
 	int res = _access(dbFile.c_str(), 0);
@@ -134,11 +134,17 @@ Output: < None >
 void SqliteDataBase::addNewUser(const string& username, const string& password, const string& email)
 {
 	// Inits:
-	string query = "INSERT INTO USERS VALUES ('" + username + "', '" + password + "', '" + email + "');";
+	string usersQuery = "INSERT INTO USERS VALUES ('" + username + "', '" + password + "', '" + email + "');";
+	string statsQuery = "INSERT INTO STATISTICS VALUES ('" + username + "', 0, 0, 0, 0);";
 	char* errMsg = NULL;
 
 	// Adding a new user to the DB:
-	if (sqlite3_exec(m_db, query.c_str(), nullptr, nullptr, &errMsg)) {
+	if (sqlite3_exec(m_db, usersQuery.c_str(), nullptr, nullptr, &errMsg)) {
+		std::cerr << "SQL ERROR: " << errMsg << "\n";
+	}
+
+	// Adding a new user to the DB stats:
+	if (sqlite3_exec(m_db, statsQuery.c_str(), nullptr, nullptr, &errMsg)) {
 		std::cerr << "SQL ERROR: " << errMsg << "\n";
 	}
 }
@@ -158,15 +164,15 @@ int SqliteDataBase::getNumOfPlayerWins(const string& username)
 	// Inits:
 	string query = "SELECT gamesWon FROM STATISTICS WHERE username='" + username + "';";
 	char* errMsg = NULL;
-	int correctAns = 0;
+	int totalGames = 0;
 
-	// Getting the player's number of correct answers:
-	if (sqlite3_exec(m_db, query.c_str(), intNumCallback, &correctAns, &errMsg)) {
+	// Getting the player's number of total games won:
+	if (sqlite3_exec(m_db, query.c_str(), intNumCallback, &totalGames, &errMsg)) {
 		std::cerr << "SQL ERROR: " << errMsg << "\n";
 	}
 
 	// Returning the result:
-	return correctAns;
+	return totalGames;
 }
 
 /*
@@ -179,15 +185,36 @@ int SqliteDataBase::getNumOfPlayerLosses(const string& username)
 	// Inits:
 	string query = "SELECT gamesLost FROM STATISTICS WHERE username='" + username + "';";
 	char* errMsg = NULL;
-	int totalAns = 0;
+	int totalGames = 0;
 
-	// Getting the player's number of total answers:
-	if (sqlite3_exec(m_db, query.c_str(), intNumCallback, &totalAns, &errMsg)) {
+	// Getting the player's number of total games lost:
+	if (sqlite3_exec(m_db, query.c_str(), intNumCallback, &totalGames, &errMsg)) {
 		std::cerr << "SQL ERROR: " << errMsg << "\n";
 	}
 
 	// Returning the result:
-	return totalAns;
+	return totalGames;
+}
+
+/*
+Getting a player's number of games tied
+Input : username - the player's username
+Output: avgTime  - the player's number of games tied
+*/
+int SqliteDataBase::getNumOfPlayerTies(const string& username)
+{
+	// Inits:
+	string query = "SELECT gamesTied FROM STATISTICS WHERE username='" + username + "';";
+	char* errMsg = NULL;
+	int totalGames = 0;
+
+	// Getting the player's number of total games tied:
+	if (sqlite3_exec(m_db, query.c_str(), intNumCallback, &totalGames, &errMsg)) {
+		std::cerr << "SQL ERROR: " << errMsg << "\n";
+	}
+
+	// Returning the result:
+	return totalGames;
 }
 
 /*
@@ -240,53 +267,38 @@ Output: username	   - the username
 		correctAnswers - amount of correct answers
 		totalAnswers   - total answers count
 */
-void SqliteDataBase::addStatistics(const string& username, bool wonGame)
+void SqliteDataBase::addStatistics(const string& username, int gameStatus)
 {
 	// Inits:
 	string query = "SELECT username FROM STATISTICS WHERE username='" + username + "';";
 	char* errMsg = NULL;
 	bool doesUsernameExist = false;
+	int originalWonGames = getNumOfPlayerWins(username);
+	int originalLostGames = getNumOfPlayerLosses(username);
+	int originalTiedGames = getNumOfPlayerTies(username);
+	int originalTotalGames = getNumOfPlayerGames(username);
 
 	// Getting whether the user exists:
 	if (sqlite3_exec(m_db, query.c_str(), outputExistsCallback, &doesUsernameExist, &errMsg)) {
 		std::cerr << "SQL ERROR: " << errMsg << "\n";
 	}
 
-	// Condition: username exists
-	if (doesUsernameExist)
+	// Updating:
+	switch (gameStatus)
 	{
-		// Inits:
-		int originalWonGames = getNumOfPlayerWins(username);
-		int originalLostGames = getNumOfPlayerLosses(username);
-		int originalTotalGames = getNumOfPlayerGames(username);
-
-		// Updating:
-		wonGame ? originalWonGames++ : originalLostGames++;
-		originalTotalGames++;
-
-		// Updating the current stats:
-		query = "UPDATE STATISTICS SET totalGames=" + std::to_string(originalTotalGames) + ", gamesWon=" + std::to_string(originalWonGames) +
-			", gamesLost=" + std::to_string(originalLostGames) + " WHERE username='" + username + "';";
-		if (sqlite3_exec(m_db, query.c_str(), nullptr, nullptr, &errMsg)) {
-			std::cerr << "SQL ERROR: " << errMsg << "\n";
-		}
+		case WON_GAME: originalWonGames++; break;
+		case LOST_GAME: originalLostGames++; break;
+		case TIED_GAME: originalTiedGames++; break;
+		default: break;
 	}
+	originalTotalGames++;
 
-	// Condition: new user
-	else
-	{
-		// Inits:
-		int gamesWon = 0;
-		int gamesLost = 0;
-
-		// Updating:
-		wonGame ? gamesWon++ : gamesLost++;
-
-		// Adding the new user to the table:
-		query = "INSERT INTO STATISTICS VALUES('" + username + "', 1, " + std::to_string(gamesWon) + ", " + std::to_string(gamesLost) + ");";
-		if (sqlite3_exec(m_db, query.c_str(), nullptr, nullptr, &errMsg)) {
-			std::cerr << "SQL ERROR: " << errMsg << "\n";
-		}
+	// Updating the current stats:
+	query = "UPDATE STATISTICS SET totalGames=" + std::to_string(originalTotalGames) + ", gamesWon=" + std::to_string(originalWonGames) +
+		", gamesLost=" + std::to_string(originalLostGames) + ", gamesTied=" + std::to_string(originalTiedGames) + " WHERE username='" + username + "';";
+	
+	if (sqlite3_exec(m_db, query.c_str(), nullptr, nullptr, &errMsg)) {
+		std::cerr << "SQL ERROR: " << errMsg << "\n";
 	}
 }
 

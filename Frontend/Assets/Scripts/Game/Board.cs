@@ -13,6 +13,8 @@ public class Board : MonoBehaviour
     public GameObject cell;
     public Transform canvas;
     public List<Sprite> chessSprites = new List<Sprite>();
+    public GameObject resultsCanvas;
+    public Text resultsText;
     [HideInInspector] public GameObject[,] guiBoardArr = new GameObject[BOARD_SIZE, BOARD_SIZE];
     [HideInInspector] public Piece[,] boardArr = new Piece[BOARD_SIZE, BOARD_SIZE];
     [HideInInspector] public string currentMove;
@@ -135,8 +137,8 @@ public class Board : MonoBehaviour
     {
         while (true)
         {
-            // Waiting for half a second:
-            yield return new WaitForSeconds(Data.DELAY_TIME);
+            // Waiting:
+            yield return new WaitForSeconds(0.1f);
             
             // Current player has played:
             if (playerMove != "")
@@ -147,7 +149,21 @@ public class Board : MonoBehaviour
                 // Reading the response:
                 string msg = communicator.Read();
 
-                Debug.Log(playerMove + " " + currentMove);
+                // Condition: game ended with win
+                if (playerMove.Contains("#"))
+                {
+                    resultsText.text = "WIN";
+                    resultsCanvas.SetActive(true);
+                    yield break;
+                }
+
+                // Condition: game ended with tie
+                else if (playerMove.Contains("%"))
+                {
+                    resultsText.text = "TIE";
+                    resultsCanvas.SetActive(true);
+                    yield break;
+                }
 
                 // Resetting the player's move:
                 playerMove = "";
@@ -161,7 +177,6 @@ public class Board : MonoBehaviour
                 // Deserializing the response:
                 GetRoomStateResponse response = Deserializer.DeserializeResponse<GetRoomStateResponse>(communicator.Read());
 
-                print("STATE: " + currentMove + " " + response.CurrentMove);
                 // Condition: a move has been played
                 if (response.CurrentMove != currentMove)
                 {
@@ -170,6 +185,30 @@ public class Board : MonoBehaviour
 
                     // Updating the current move:
                     currentMove = response.CurrentMove;
+
+                    // Condition: game ended with lose
+                    if (currentMove.Contains("#"))
+                    {
+                        resultsText.text = "LOST";
+                        resultsCanvas.SetActive(true);
+                        yield break;
+                    }
+
+                    // Condition: game ended with tie
+                    else if (currentMove.Contains("%"))
+                    {
+                        resultsText.text = "TIE";
+                        resultsCanvas.SetActive(true);
+                        yield break;
+                    }
+
+                    // Condition: game ended with win
+                    else if (currentMove.Contains("OPPONENT LEFT"))
+                    {
+                        resultsText.text = "WIN";
+                        resultsCanvas.SetActive(true);
+                        yield break;
+                    }
 
                     // Updating the board:
                     UpdateBoard(new Position(currentMove[2] - '1', currentMove[1] - 'a'),
@@ -239,8 +278,6 @@ public class Board : MonoBehaviour
     private void UpdateBoard(Position src, Position dst)
     {
         // Changing the GUI:
-        print("DST: " + dst.row + " " + dst.col);
-        print("SRC: " + src.row + " " + src.col);
         Destroy(guiBoardArr[dst.row, dst.col]);
         guiBoardArr[dst.row, dst.col] = CreateCell(dst.row, dst.col,
             boardArr[src.row, src.col].type);
@@ -251,5 +288,25 @@ public class Board : MonoBehaviour
         boardArr[dst.row, dst.col] = boardArr[src.row, src.col];
         boardArr[dst.row, dst.col].position = new Position(dst.row, dst.col);
         boardArr[src.row, src.col] = null;
+    }
+
+    public void ReturnToMenu()
+    {
+        Debug.Log("2");
+
+        Debug.Log("2");
+
+        // Sending the leave room request:
+        communicator.Write(Serializer.SerializeRequest<LeaveRoomRequest>(new LeaveRoomRequest { }, Serializer.LEAVE_ROOM_REQUEST));
+
+        Debug.Log("2");
+
+        // Reading the message:
+        string msg = communicator.Read();
+
+        Debug.Log("2");
+
+        // Switching to the menu scene:
+        this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.MENU_SCENE_COUNT);
     }
 }

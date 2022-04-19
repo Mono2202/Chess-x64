@@ -12,6 +12,16 @@ void Room::setIsActive(unsigned int flag)
 	this->m_metadata.isActive = flag;
 }
 
+bool Room::getIsActive() const
+{
+	return this->m_metadata.isActive;
+}
+
+/*
+Setting the current move
+Input : move - the move
+Output: < None >
+*/
 void Room::setCurrentMove(string move)
 {
 	// Condition: choosing players
@@ -74,9 +84,6 @@ void Room::removeUser(LoggedUser user)
 		// Removing the user:
 		m_users.erase(userFound);
 	}
-
-	// Stopping the game:
-	m_metadata.isActive = false;
 }
 
 /*

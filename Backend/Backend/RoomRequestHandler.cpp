@@ -80,20 +80,26 @@ RequestResult RoomRequestHandler::leaveRoom(RequestInfo request)
 {
     // Inits:
     RequestResult result;
-    m_room = *(m_roomManager.getRoom(m_room.getRoomData().id));
 
     // Removing the current user from the room:
-    m_room.removeUser(m_user);
-    
+    m_roomManager.getRoom(m_room.getRoomData().id)->removeUser(m_user);
+
     // Condition: there is a user in the room
-    if (m_room.getAllUsers().size()) {
-        m_roomManager.getRoom(m_room.getRoomData().id)->setCurrentMove("WIN");
+    if (m_roomManager.getRoom(m_room.getRoomData().id)->getAllUsers().size() > 0 &&
+        m_roomManager.getRoom(m_room.getRoomData().id)->getIsActive()) {
+        // Updating the room:
+        m_roomManager.getRoom(m_room.getRoomData().id)->setCurrentMove("OPPONENT LEFT");
         m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false);
+
+        // Adding the stats:
+        m_roomManager.getDatabase()->addStatistics(m_user.getUsername(), WON_GAME);
+        std::cout << "Win\n";
     }
 
     // Condition: 0 users in the room
-    else {
+    else if (m_roomManager.getRoom(m_room.getRoomData().id)->getAllUsers().size() == 0) {
         m_roomManager.deleteRoom(m_room.getRoomData().id);
+        std::cout << "Delete\n";
     }
 
     // Creating response:
@@ -115,18 +121,33 @@ RequestResult RoomRequestHandler::submitMove(RequestInfo request)
 {
     // Inits:
     RequestResult result;
-
-    std::cout << "before: " << m_roomManager.getRoom(m_room.getRoomData().id)->getRoomData().currentMove << " %%% " << JsonRequestPacketDeserializer::deserializeSubmitMoveRequest(request.buffer).move;
+    SubmitMoveRequest deserializedRequest = JsonRequestPacketDeserializer::deserializeSubmitMoveRequest(request.buffer);
 
     // Creating Response:
-    m_roomManager.getRoom(m_room.getRoomData().id)->setCurrentMove(JsonRequestPacketDeserializer::deserializeSubmitMoveRequest(request.buffer).move);
+    m_roomManager.getRoom(m_room.getRoomData().id)->setCurrentMove(deserializedRequest.move);
     SubmitMoveResponse response = { SUCCESS_STATUS };
 
-    std::cout << "updated: " << m_roomManager.getRoom(m_room.getRoomData().id)->getRoomData().currentMove;
+    // Checking if the game has ended by win:
+    if (deserializedRequest.move.find('#') != std::string::npos)
+    {
+        // Adding the stats:
+        m_roomManager.getDatabase()->addStatistics(m_user.getUsername(), WON_GAME);
+        string otherUser = (m_room.getAllUsers()[0] != m_user.getUsername()) ? m_room.getAllUsers()[0] : m_room.getAllUsers()[1];
+        m_roomManager.getDatabase()->addStatistics(otherUser, LOST_GAME);
+        m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false);
+    }
 
-    // TODO: FINISH GAME, ADD STATS
+    // Checking if the game has ended by tie:
+    else if (deserializedRequest.move.find('%') != std::string::npos)
+    {
+        // Adding the stats:
+        m_roomManager.getDatabase()->addStatistics(m_user.getUsername(), TIED_GAME);
+        string otherUser = (m_room.getAllUsers()[0] != m_user.getUsername()) ? m_room.getAllUsers()[0] : m_room.getAllUsers()[1];
+        m_roomManager.getDatabase()->addStatistics(otherUser, TIED_GAME);
+        m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false);
+    }
 
-    // Creating result;
+    // Creating result:
     result.buffer = JsonResponsePacketSerializer::serializeResponse(response);
     result.newHandler = nullptr;
     return result;

@@ -9,6 +9,11 @@
 using std::string;
 using std::vector;
 
+// Defines:
+#define WON_GAME 0
+#define LOST_GAME 1
+#define TIED_GAME 2
+
 
 // IDatabase Class:
 class IDatabase
@@ -36,7 +41,8 @@ public:
 	// Queries:
 	virtual int getNumOfPlayerWins(const string& username) = 0;
 	virtual int getNumOfPlayerLosses(const string& username) = 0;
+	virtual int getNumOfPlayerTies(const string& username) = 0;
 	virtual int getNumOfPlayerGames(const string& username) = 0;
 	virtual vector<string> getHighScores() = 0;
-	virtual void addStatistics(const string& username, bool wonGame) = 0;
+	virtual void addStatistics(const string& username, int gameStatus) = 0;
 };

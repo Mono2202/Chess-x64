@@ -34,4 +34,10 @@ public class Data : MonoBehaviour
         // Switching to the login scene:
         SceneManager.LoadScene(LOGIN_SCENE_INDEX);
     }
+
+    void OnApplicationQuit()
+    {
+        Debug.Log("BYE");
+        instance.communicator.Write("ERROR");
+    }
 }
