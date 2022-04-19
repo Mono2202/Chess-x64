@@ -66,4 +66,16 @@ public class Searching : MonoBehaviour
             }
         }
     }
+
+    public void ReturnToMenu()
+    {
+        // Sending the leave room request:
+        communicator.Write(Serializer.SerializeRequest<LeaveRoomRequest>(new LeaveRoomRequest { }, Serializer.LEAVE_ROOM_REQUEST));
+
+        // Reading the message:
+        string msg = communicator.Read();
+
+        // Switching to the menu scene:
+        this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.MENU_SCENE_COUNT);
+    }
 }
