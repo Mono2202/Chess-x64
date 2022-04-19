@@ -43,6 +43,7 @@ public:
 	virtual int getNumOfPlayerLosses(const string& username);
 	virtual int getNumOfPlayerTies(const string& username);
 	virtual int getNumOfPlayerGames(const string& username);
+	virtual int getPlayerElo(const string& username);
 	virtual vector<string> getHighScores();
 	virtual void addStatistics(const string& username, int gameStatus);
 
