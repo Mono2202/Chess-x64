@@ -292,19 +292,11 @@ public class Board : MonoBehaviour
 
     public void ReturnToMenu()
     {
-        Debug.Log("2");
-
-        Debug.Log("2");
-
         // Sending the leave room request:
         communicator.Write(Serializer.SerializeRequest<LeaveRoomRequest>(new LeaveRoomRequest { }, Serializer.LEAVE_ROOM_REQUEST));
 
-        Debug.Log("2");
-
         // Reading the message:
         string msg = communicator.Read();
-
-        Debug.Log("2");
 
         // Switching to the menu scene:
         this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.MENU_SCENE_COUNT);
