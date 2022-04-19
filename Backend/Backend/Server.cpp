@@ -4,7 +4,7 @@ Server* Server::m_serverInstance = nullptr;
 // C'tors:
 
 Server::Server(IDatabase* database) :
-	m_database(database), m_handlerFactory(*LoginManager::getInstance(database), database, *RoomManager::getInstance(), *StatisticsManager::getInstance(database))
+	m_database(database), m_handlerFactory(*LoginManager::getInstance(database), database, *RoomManager::getInstance(database), *StatisticsManager::getInstance(database))
 {
 	m_communicator = Communicator::getInstance(m_handlerFactory);
 }

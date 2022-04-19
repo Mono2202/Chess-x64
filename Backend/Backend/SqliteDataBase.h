@@ -41,9 +41,10 @@ public:
 	// Queries:
 	virtual int getNumOfPlayerWins(const string& username);
 	virtual int getNumOfPlayerLosses(const string& username);
+	virtual int getNumOfPlayerTies(const string& username);
 	virtual int getNumOfPlayerGames(const string& username);
 	virtual vector<string> getHighScores();
-	virtual void addStatistics(const string& username, bool wonGame);
+	virtual void addStatistics(const string& username, int gameStatus);
 
 private:
 	// Private C'tor:

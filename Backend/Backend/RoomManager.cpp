@@ -3,12 +3,18 @@ RoomManager* RoomManager::m_roomManagerInstance = nullptr;
 
 // C'tor:
 
-RoomManager* RoomManager::getInstance()
+RoomManager::RoomManager(IDatabase* database)
+{
+	// Setting the database:
+	m_database = database;
+}
+
+RoomManager* RoomManager::getInstance(IDatabase* database)
 {
 	if (m_roomManagerInstance == nullptr) {
-		m_roomManagerInstance = new RoomManager();
+		m_roomManagerInstance = new RoomManager(database);
 	}
-
+	
 	return m_roomManagerInstance;
 }
 
@@ -117,7 +123,8 @@ RoomData RoomManager::getEloRoom() const
 	for (auto& room : m_rooms) {
 		// Condition: game found by ELO points
 		if (room.second.getRoomData().gameMode[0] == ELO_GAME_MODE &&
-			!room.second.getRoomData().isActive) {
+			!room.second.getRoomData().isActive &&
+			room.second.getRoomData().currentMove != "OPPONENT LEFT") {
 			return room.second.getRoomData();
 		}
 
@@ -126,4 +133,9 @@ RoomData RoomManager::getEloRoom() const
 
 	// Condition: no game was found
 	return currentRoomData;
+}
+
+IDatabase* RoomManager::getDatabase() const
+{
+	return m_database;
 }

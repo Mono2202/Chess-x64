@@ -3,6 +3,7 @@
 // Includes:
 #include "LoggedUser.h"
 #include <vector>
+#include <algorithm>
 
 // Defines:
 #define MAX_PLAYERS 2
@@ -32,6 +33,7 @@ public:
 
 	// Methods:
 	void setIsActive(unsigned int flag);
+	bool getIsActive() const;
 	void setCurrentMove(string move);
 	void addUser(LoggedUser user);
 	void removeUser(LoggedUser user);

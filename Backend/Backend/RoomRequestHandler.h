@@ -3,6 +3,7 @@
 // Includes:
 #include "IRequestHandler.h"
 #include "RoomManager.h"
+#include <string>
 
 // Class Declaration:
 class RequestHandlerFactory;

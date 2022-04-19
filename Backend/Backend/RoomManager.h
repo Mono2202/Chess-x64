@@ -2,6 +2,7 @@
 
 // Includes:
 #include "Room.h"
+#include "IDatabase.h"
 #include <map>
 
 // Using:
@@ -12,7 +13,7 @@ class RoomManager
 {
 public:
 	// Static C'tor:
-	static RoomManager* getInstance();
+	static RoomManager* getInstance(IDatabase* database);
 
 	// D'tor:
 	~RoomManager();
@@ -24,12 +25,14 @@ public:
 	vector<RoomData> getRooms() const;
 	Room* getRoom(int ID);
 	RoomData getEloRoom() const;
+	IDatabase* getDatabase() const;
 
 private:
 	// Private C'tor:
-	RoomManager() = default;
+	RoomManager(IDatabase* database);
 
 	// Fields:
 	static RoomManager* m_roomManagerInstance;
 	map<unsigned int, Room> m_rooms;
+	IDatabase* m_database;
 };
