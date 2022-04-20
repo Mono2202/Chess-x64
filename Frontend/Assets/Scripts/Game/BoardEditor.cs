@@ -11,6 +11,7 @@ public class BoardEditor : MonoBehaviour
     // Fields:
     public GameObject cell;
     public Transform canvas;
+    public InputField turnInput;
     public List<Sprite> chessSprites = new List<Sprite>();
     [HideInInspector] public GameObject[,] guiBoardArr = new GameObject[BOARD_SIZE, BOARD_SIZE];
     [HideInInspector] public Piece[,] boardArr = new Piece[BOARD_SIZE, BOARD_SIZE];
@@ -75,6 +76,9 @@ public class BoardEditor : MonoBehaviour
                 guiBoardArr[i, j] = CreateCell(i, j, INITIAL_BOARD[i, j]);
             }
         }
+
+        // Starting communication with engine:
+        StartCoroutine(UseEngine());
     }
 
     // Update is called once per frame
@@ -89,6 +93,58 @@ public class BoardEditor : MonoBehaviour
             // Resetting the properties:
             selectedPiece = null;
             selectedDest = null;
+        }
+    }
+
+    private IEnumerator UseEngine()
+    {
+        while (true)
+        {
+            // Waiting:
+            yield return new WaitForSeconds(2f);
+
+            // Inits:
+            string boardFEN = "";
+            int count = 0;
+
+            // Turning the board to FEN:
+            for (int i = 0; i < BOARD_SIZE; i++)
+            {
+                for (int j = 0; j < BOARD_SIZE; j++)
+                {
+                    // Condition: piece in current square
+                    if (boardArr[i, j] != null)
+                    {
+                        if (count > 0)
+                            boardFEN += Convert.ToString(count) + boardArr[i, j].type;
+                        else
+                            boardFEN += boardArr[i, j].type;
+                        count = 0;
+                    }
+                    
+                    // Condition: empty square
+                    else
+                    {
+                        count++;
+                    }
+                }
+                
+                // Condition: more empty squares
+                if (count > 0)
+                {
+                    boardFEN += Convert.ToString(count);
+                }   
+                
+                // Resetting the counter:
+                count = 0;
+                boardFEN += "/";
+            }
+
+            // Updating the FEN:
+            boardFEN = boardFEN.Remove(boardFEN.Length - 1) + " ";
+            boardFEN += (turnInput.text != "") ? "w" : turnInput.text; // TODO: CHECK IF VALID
+
+            // TODO: ADD EXE AND READ FROM FILE
         }
     }
 
