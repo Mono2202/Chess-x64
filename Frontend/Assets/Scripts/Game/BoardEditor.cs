@@ -12,11 +12,15 @@ public class BoardEditor : MonoBehaviour
     public GameObject cell;
     public Transform canvas;
     public InputField turnInput;
+    public Text bestMoveText;
+    public Text addPieceText;
     public List<Sprite> chessSprites = new List<Sprite>();
     [HideInInspector] public GameObject[,] guiBoardArr = new GameObject[BOARD_SIZE, BOARD_SIZE];
     [HideInInspector] public Piece[,] boardArr = new Piece[BOARD_SIZE, BOARD_SIZE];
     [HideInInspector] public Position selectedPiece;
     [HideInInspector] public Position selectedDest;
+    [HideInInspector] public bool turnChanged;
+    [HideInInspector] public string currentTurn;
 
     // Constants:
     public const int BOARD_SIZE = 8;
@@ -77,13 +81,23 @@ public class BoardEditor : MonoBehaviour
             }
         }
 
-        // Starting communication with engine:
-        StartCoroutine(UseEngine());
+        // Updating the current player:
+        turnInput.text = "w";
+        currentTurn = turnInput.text;
     }
 
     // Update is called once per frame
     void Update()
     {
+        // Condition: different turn
+        if (currentTurn != turnInput.text)
+        {
+            turnChanged = true;
+        }
+
+        // Setting the current turn:
+        currentTurn = turnInput.text;
+
         // Condition: move was played
         if (selectedPiece != null && selectedDest != null)
         {
@@ -93,59 +107,111 @@ public class BoardEditor : MonoBehaviour
             // Resetting the properties:
             selectedPiece = null;
             selectedDest = null;
-        }
-    }
 
-    private IEnumerator UseEngine()
-    {
-        while (true)
-        {
-            // Waiting:
-            yield return new WaitForSeconds(2f);
+            // Updating the current player:
+            turnInput.text = (turnInput.text == "w") ? "b" : "w";
+            currentTurn = turnInput.text;
 
-            // Inits:
-            string boardFEN = "";
-            int count = 0;
-
-            // Turning the board to FEN:
-            for (int i = 0; i < BOARD_SIZE; i++)
+            // Using the engine:
+            try
             {
-                for (int j = 0; j < BOARD_SIZE; j++)
-                {
-                    // Condition: piece in current square
-                    if (boardArr[i, j] != null)
-                    {
-                        if (count > 0)
-                            boardFEN += Convert.ToString(count) + boardArr[i, j].type;
-                        else
-                            boardFEN += boardArr[i, j].type;
-                        count = 0;
-                    }
-                    
-                    // Condition: empty square
-                    else
-                    {
-                        count++;
-                    }
-                }
-                
-                // Condition: more empty squares
-                if (count > 0)
-                {
-                    boardFEN += Convert.ToString(count);
-                }   
-                
-                // Resetting the counter:
-                count = 0;
-                boardFEN += "/";
+                UseEngine();
             }
 
-            // Updating the FEN:
-            boardFEN = boardFEN.Remove(boardFEN.Length - 1) + " ";
-            boardFEN += (turnInput.text != "") ? "w" : turnInput.text; // TODO: CHECK IF VALID
+            catch
+            {
 
-            // TODO: ADD EXE AND READ FROM FILE
+            }
         }
+
+        // Condition: a turn has changed
+        if (turnChanged)
+        {
+            try
+            {
+                UseEngine();
+            }
+
+            catch
+            {
+
+            }
+        }
+
+        // Setting the flag:
+        turnChanged = false;
+    }
+
+    private void UseEngine()
+    {
+        // Inits:
+        string boardFEN = "";
+        int count = 0;
+
+        // Turning the board to FEN:
+        for (int i = 0; i < BOARD_SIZE; i++)
+        {
+            for (int j = 0; j < BOARD_SIZE; j++)
+            {
+                // Condition: piece in current square
+                if (boardArr[i, j] != null)
+                {
+                    if (count > 0)
+                        boardFEN += Convert.ToString(count) + boardArr[i, j].type;
+                    else
+                        boardFEN += boardArr[i, j].type;
+                    count = 0;
+                }
+
+                // Condition: empty square
+                else
+                {
+                    count++;
+                }
+            }
+
+            // Condition: more empty squares
+            if (count > 0)
+            {
+                boardFEN += Convert.ToString(count);
+            }
+
+            // Resetting the counter:
+            count = 0;
+            boardFEN += "/";
+        }
+
+        // Updating the FEN:
+        boardFEN = boardFEN.Remove(boardFEN.Length - 1) + " ";
+        boardFEN += (turnInput.text == "") ? "w" : turnInput.text; // TODO: CHECK IF VALID
+
+        // Execute stockfish:
+        var p = new System.Diagnostics.Process();
+        p.StartInfo.FileName = Application.streamingAssetsPath + "/Stockfish.exe";
+        p.StartInfo.UseShellExecute = false;
+        p.StartInfo.RedirectStandardInput = true;
+        p.StartInfo.RedirectStandardOutput = true;
+        p.StartInfo.CreateNoWindow = true;
+        p.Start();
+
+        // Setting the position:
+        string setupString = "position fen " + boardFEN + " KQkq - 0 1";
+        p.StandardInput.WriteLine(setupString);
+
+        // Calculating:
+        string processString = "go depth 5";
+        p.StandardInput.WriteLine(processString);
+
+        // Getting the best move in the current position:
+        string bestMove = p.StandardOutput.ReadLine();
+        while (!bestMove.Contains("bestmove"))
+        {
+            bestMove = p.StandardOutput.ReadLine();
+        }
+        bestMoveText.text = bestMove.Substring(9, 4);
+
+        // Closing the process: 
+        p.Close();
     }
 
     private Piece CreatePiece(char type, Position position)
@@ -224,5 +290,39 @@ public class BoardEditor : MonoBehaviour
     {
         // Switching to the menu scene:
         this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.MENU_SCENE_COUNT);
+    }
+
+    public void AddPiece()
+    {
+        try
+        {
+            // Setting the position
+            print(addPieceText.text);
+            Position pos = new Position(addPieceText.text[2] - '1', addPieceText.text[1] - 'a');
+
+            // Changing the GUI:
+            Destroy(guiBoardArr[pos.row, pos.col]);
+            guiBoardArr[pos.row, pos.col] = CreateCell(pos.row, pos.col,
+                addPieceText.text[0]);
+
+            // Changing the board array:
+            boardArr[pos.row, pos.col] = CreatePiece(addPieceText.text[0], pos);
+
+            // Using the engine:
+            try
+            {
+                UseEngine();
+            }
+
+            catch
+            {
+
+            }
+        }
+
+        catch
+        {
+            return; // TODO: ADD POPUP ERROR
+        }
     }
 }
