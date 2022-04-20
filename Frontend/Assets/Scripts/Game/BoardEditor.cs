@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -21,6 +22,7 @@ public class BoardEditor : MonoBehaviour
     [HideInInspector] public Position selectedDest;
     [HideInInspector] public bool turnChanged;
     [HideInInspector] public string currentTurn;
+    [HideInInspector] public string currentMove = "";
 
     // Constants:
     public const int BOARD_SIZE = 8;
@@ -115,7 +117,8 @@ public class BoardEditor : MonoBehaviour
             // Using the engine:
             try
             {
-                UseEngine();
+                Thread tEngine = new Thread(new ThreadStart(UseEngine));
+                tEngine.Start();
             }
 
             catch
@@ -129,7 +132,8 @@ public class BoardEditor : MonoBehaviour
         {
             try
             {
-                UseEngine();
+                Thread tEngine = new Thread(new ThreadStart(UseEngine));
+                tEngine.Start();
             }
 
             catch
@@ -140,6 +144,9 @@ public class BoardEditor : MonoBehaviour
 
         // Setting the flag:
         turnChanged = false;
+
+        // Setting the best move:
+        bestMoveText.text = currentMove;
     }
 
     private void UseEngine()
@@ -208,7 +215,7 @@ public class BoardEditor : MonoBehaviour
         {
             bestMove = p.StandardOutput.ReadLine();
         }
-        bestMoveText.text = bestMove.Substring(9, 4);
+        currentMove = bestMove.Substring(9, 4);
 
         // Closing the process: 
         p.Close();
@@ -311,7 +318,8 @@ public class BoardEditor : MonoBehaviour
             // Using the engine:
             try
             {
-                UseEngine();
+                Thread tEngine = new Thread(new ThreadStart(UseEngine));
+                tEngine.Start();
             }
 
             catch
