@@ -44,6 +44,8 @@ vector<string> StatisticsManager::getUserStatistics(const string& username)
 	stats.push_back(std::to_string(m_database->getNumOfPlayerGames(username)));
 	stats.push_back(std::to_string(m_database->getNumOfPlayerWins(username)));
 	stats.push_back(std::to_string(m_database->getNumOfPlayerLosses(username)));
+	stats.push_back(std::to_string(m_database->getNumOfPlayerTies(username)));
+	stats.push_back(std::to_string(m_database->getPlayerElo(username)));
 	return stats;
 }
 

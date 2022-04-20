@@ -16,6 +16,7 @@ public class Data : MonoBehaviour
     public const int MENU_SCENE_COUNT = 3;
     public const int SEARCHING_SCENE_COUNT = 4;
     public const int GAME_SCENE_COUNT = 5;
+    public const int STATS_SCENE_COUNT = 6;
 
     public const float DELAY_TIME = 0.5f;
 
@@ -37,7 +38,6 @@ public class Data : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        Debug.Log("BYE");
         instance.communicator.Write("ERROR");
     }
 }

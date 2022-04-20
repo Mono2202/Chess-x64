@@ -7,6 +7,7 @@ public class Login : MonoBehaviour
     public InputField usernameInput;
     public InputField passwordInput;
     public Button signInButton;
+    public GameObject popupWindow;
     private Communicator communicator;
 
     void Start()
@@ -34,8 +35,8 @@ public class Login : MonoBehaviour
         {
             // Getting the error message:
             ErrorResponse err = Deserializer.DeserializeResponse<ErrorResponse>(msg);
-            //EditorUtility.DisplayDialog("Login Failed", response.Message, "Try Again");
-            // TODO: ADD MESSAGE BOX
+            popupWindow.GetComponent<PopupWindow>().SetProperties("ERROR", err.Message, new Color32(240, 41, 41, 255), new Color32(240, 41, 41, 255));
+            popupWindow.SetActive(true);
 
             // Resetting the inputs:
             usernameInput.text = "";

@@ -13,8 +13,8 @@ public class Board : MonoBehaviour
     public GameObject cell;
     public Transform canvas;
     public List<Sprite> chessSprites = new List<Sprite>();
-    public GameObject resultsCanvas;
-    public Text resultsText;
+    public GameObject returnButton;
+    public GameObject popupWindow;
     [HideInInspector] public GameObject[,] guiBoardArr = new GameObject[BOARD_SIZE, BOARD_SIZE];
     [HideInInspector] public Piece[,] boardArr = new Piece[BOARD_SIZE, BOARD_SIZE];
     [HideInInspector] public string currentMove;
@@ -152,16 +152,18 @@ public class Board : MonoBehaviour
                 // Condition: game ended with win
                 if (playerMove.Contains("#"))
                 {
-                    resultsText.text = "WIN";
-                    resultsCanvas.SetActive(true);
+                    popupWindow.GetComponent<PopupWindow>().SetProperties("Results", "Win", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
+                    popupWindow.SetActive(true);
+                    returnButton.SetActive(true);
                     yield break;
                 }
 
                 // Condition: game ended with tie
                 else if (playerMove.Contains("%"))
                 {
-                    resultsText.text = "TIE";
-                    resultsCanvas.SetActive(true);
+                    popupWindow.GetComponent<PopupWindow>().SetProperties("Results", "Tie", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
+                    popupWindow.SetActive(true);
+                    returnButton.SetActive(true);
                     yield break;
                 }
 
@@ -189,24 +191,27 @@ public class Board : MonoBehaviour
                     // Condition: game ended with lose
                     if (currentMove.Contains("#"))
                     {
-                        resultsText.text = "LOST";
-                        resultsCanvas.SetActive(true);
+                        popupWindow.GetComponent<PopupWindow>().SetProperties("Results", "Lose", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
+                        popupWindow.SetActive(true);
+                        returnButton.SetActive(true);
                         yield break;
                     }
 
                     // Condition: game ended with tie
                     else if (currentMove.Contains("%"))
                     {
-                        resultsText.text = "TIE";
-                        resultsCanvas.SetActive(true);
+                        popupWindow.GetComponent<PopupWindow>().SetProperties("Results", "Tie", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
+                        popupWindow.SetActive(true);
+                        returnButton.SetActive(true);
                         yield break;
                     }
 
                     // Condition: game ended with win
                     else if (currentMove.Contains("OPPONENT LEFT"))
                     {
-                        resultsText.text = "WIN";
-                        resultsCanvas.SetActive(true);
+                        popupWindow.GetComponent<PopupWindow>().SetProperties("Results", "Win", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
+                        popupWindow.SetActive(true);
+                        returnButton.SetActive(true);
                         yield break;
                     }
 

@@ -34,7 +34,7 @@ bool SqliteDataBase::open()
 	// Inits:
 	string query = "CREATE TABLE USERS(username TEXT NOT NULL PRIMARY KEY, password TEXT NOT NULL, email TEXT NOT NULL);\n\
 					CREATE TABLE STATISTICS(username TEXT NOT NULL PRIMARY KEY,\
-					totalGames INTEGER NOT NULL, gamesWon INTEGER NOT NULL, gamesLost INTEGER NOT NULL, gamesTied INTEGER NOT NULL);";
+					totalGames INTEGER NOT NULL, gamesWon INTEGER NOT NULL, gamesLost INTEGER NOT NULL, gamesTied INTEGER NOT NULL, elo INTEGER NOT NULL);";
 	string dbFile = "ChessDB.db";
 	char* errMsg = NULL;
 	int res = _access(dbFile.c_str(), 0);
@@ -135,7 +135,7 @@ void SqliteDataBase::addNewUser(const string& username, const string& password, 
 {
 	// Inits:
 	string usersQuery = "INSERT INTO USERS VALUES ('" + username + "', '" + password + "', '" + email + "');";
-	string statsQuery = "INSERT INTO STATISTICS VALUES ('" + username + "', 0, 0, 0, 0);";
+	string statsQuery = "INSERT INTO STATISTICS VALUES ('" + username + "', 0, 0, 0, 0, 1000);";
 	char* errMsg = NULL;
 
 	// Adding a new user to the DB:
@@ -239,6 +239,27 @@ int SqliteDataBase::getNumOfPlayerGames(const string& username)
 }
 
 /*
+Getting a player's ELO
+Input : username - the player's username
+Output: avgTime  - the player's ELO
+*/
+int SqliteDataBase::getPlayerElo(const string& username)
+{
+	// Inits:
+	string query = "SELECT elo FROM STATISTICS WHERE username='" + username + "';";
+	char* errMsg = NULL;
+	int elo = 0;
+
+	// Getting the player's ELO:
+	if (sqlite3_exec(m_db, query.c_str(), intNumCallback, &elo, &errMsg)) {
+		std::cerr << "SQL ERROR: " << errMsg << "\n";
+	}
+
+	// Returning the result:
+	return elo;
+}
+
+/*
 Getting the highscores
 Input : < None >
 Output: topScores - the highscores
@@ -277,6 +298,7 @@ void SqliteDataBase::addStatistics(const string& username, int gameStatus)
 	int originalLostGames = getNumOfPlayerLosses(username);
 	int originalTiedGames = getNumOfPlayerTies(username);
 	int originalTotalGames = getNumOfPlayerGames(username);
+	int originalElo = getPlayerElo(username);
 
 	// Getting whether the user exists:
 	if (sqlite3_exec(m_db, query.c_str(), outputExistsCallback, &doesUsernameExist, &errMsg)) {
@@ -284,10 +306,11 @@ void SqliteDataBase::addStatistics(const string& username, int gameStatus)
 	}
 
 	// Updating:
+	// TODO: CHANGE ELO GAIN
 	switch (gameStatus)
 	{
-		case WON_GAME: originalWonGames++; break;
-		case LOST_GAME: originalLostGames++; break;
+		case WON_GAME: originalWonGames++; originalElo += 25;  break;
+		case LOST_GAME: originalLostGames++; originalElo -= 25; break;
 		case TIED_GAME: originalTiedGames++; break;
 		default: break;
 	}
@@ -295,7 +318,8 @@ void SqliteDataBase::addStatistics(const string& username, int gameStatus)
 
 	// Updating the current stats:
 	query = "UPDATE STATISTICS SET totalGames=" + std::to_string(originalTotalGames) + ", gamesWon=" + std::to_string(originalWonGames) +
-		", gamesLost=" + std::to_string(originalLostGames) + ", gamesTied=" + std::to_string(originalTiedGames) + " WHERE username='" + username + "';";
+		", gamesLost=" + std::to_string(originalLostGames) + ", gamesTied=" + std::to_string(originalTiedGames) + ", elo=" + std::to_string(originalElo) + 
+		" WHERE username='" + username + "';";
 	
 	if (sqlite3_exec(m_db, query.c_str(), nullptr, nullptr, &errMsg)) {
 		std::cerr << "SQL ERROR: " << errMsg << "\n";
