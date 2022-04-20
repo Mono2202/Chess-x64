@@ -326,10 +326,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 758936902}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4330f483a23922a498f2c5fdecf3fab7, type: 3}
+  m_Script: {fileID: 11500000, guid: 636b7a39ef1c49c4ea11393f0d8c0eb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cell: {fileID: 8124469985080007730, guid: c3fd9265fea7bfe4ba827920f1159f90, type: 3}
+  cell: {fileID: 8124469985080007730, guid: e2f01522aea768e408e8ef5d162b3816, type: 3}
   canvas: {fileID: 758936906}
   chessSprites:
   - {fileID: 21300000, guid: 1227314632acece469017d7c9cb6c604, type: 3}
@@ -344,12 +344,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 18932b108f45d834b8fd52a24ff4d7f7, type: 3}
   - {fileID: 21300000, guid: b4db2dc892b832c4297c3cfa2fa4359b, type: 3}
   - {fileID: 21300000, guid: 7c1d8c7858288294cbb1b33bc5c735f6, type: 3}
-  returnButton: {fileID: 1528535781}
-  popupWindow: {fileID: 0}
-  currentMove: 
-  isPlayerWhite: 0
-  isCurrentPlayerWhite: 0
-  playerMove: 
 --- !u!1 &1036864028
 GameObject:
   m_ObjectHideFlags: 0
@@ -574,7 +568,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 758936908}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Board, Assembly-CSharp
         m_MethodName: ReturnToMenu
         m_Mode: 1
