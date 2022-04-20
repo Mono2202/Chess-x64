@@ -128,9 +128,6 @@ public class Board : MonoBehaviour
             selectedPiece = null;
             selectedDest = null;
         }
-
-        // TODO: SEND SUBMIT MOVE MESSAGE TO SERVER
-
     }
 
     private IEnumerator GetGameState()
