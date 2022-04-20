@@ -8,6 +8,7 @@ public class Register : MonoBehaviour
     public InputField passwordInput;
     public InputField emailInput;
     public Button signUpButton;
+    public GameObject popupWindow;
     private Communicator communicator;
 
     // Start is called before the first frame update
@@ -36,8 +37,8 @@ public class Register : MonoBehaviour
         {
             // Getting the error message:
             ErrorResponse err = Deserializer.DeserializeResponse<ErrorResponse>(msg);
-            //EditorUtility.DisplayDialog("Sign-up Failed", response.Message, "Try Again");
-            // TODO: ADD MESSAGE BOX
+            popupWindow.GetComponent<PopupWindow>().SetProperties("ERROR", err.Message, new Color32(240, 41, 41, 255), new Color32(240, 41, 41, 255));
+            popupWindow.SetActive(true);
             return;
         }
 
