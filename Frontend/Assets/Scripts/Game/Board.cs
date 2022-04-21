@@ -14,6 +14,9 @@ public class Board : MonoBehaviour
     public Transform canvas;
     public List<Sprite> chessSprites = new List<Sprite>();
     public GameObject returnButton;
+    public GameObject returnButtonSignResign;
+    public GameObject returnButtonSignLeave;
+    public Text returnButtonText;
     public GameObject popupWindow;
     [HideInInspector] public GameObject[,] guiBoardArr = new GameObject[BOARD_SIZE, BOARD_SIZE];
     [HideInInspector] public Piece[,] boardArr = new Piece[BOARD_SIZE, BOARD_SIZE];
@@ -149,18 +152,14 @@ public class Board : MonoBehaviour
                 // Condition: game ended with win
                 if (playerMove.Contains("#"))
                 {
-                    popupWindow.GetComponent<PopupWindow>().SetProperties("Results", "Win", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
-                    popupWindow.SetActive(true);
-                    returnButton.SetActive(true);
+                    GameOver("Win", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
                     yield break;
                 }
 
                 // Condition: game ended with tie
                 else if (playerMove.Contains("%"))
                 {
-                    popupWindow.GetComponent<PopupWindow>().SetProperties("Results", "Tie", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
-                    popupWindow.SetActive(true);
-                    returnButton.SetActive(true);
+                    GameOver("Tie", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
                     yield break;
                 }
 
@@ -188,27 +187,21 @@ public class Board : MonoBehaviour
                     // Condition: game ended with lose
                     if (currentMove.Contains("#"))
                     {
-                        popupWindow.GetComponent<PopupWindow>().SetProperties("Results", "Lose", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
-                        popupWindow.SetActive(true);
-                        returnButton.SetActive(true);
+                        GameOver("Lose", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
                         yield break;
                     }
 
                     // Condition: game ended with tie
                     else if (currentMove.Contains("%"))
                     {
-                        popupWindow.GetComponent<PopupWindow>().SetProperties("Results", "Tie", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
-                        popupWindow.SetActive(true);
-                        returnButton.SetActive(true);
+                        GameOver("Tie", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
                         yield break;
                     }
 
                     // Condition: game ended with win
                     else if (currentMove.Contains("OPPONENT LEFT"))
                     {
-                        popupWindow.GetComponent<PopupWindow>().SetProperties("Results", "Win", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
-                        popupWindow.SetActive(true);
-                        returnButton.SetActive(true);
+                        GameOver("Win", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
                         yield break;
                     }
 
@@ -247,7 +240,7 @@ public class Board : MonoBehaviour
         currentCell.transform.SetParent(canvas, false);
 
         // Positioning the cell:
-        currentCell.transform.localPosition = new Vector3(-350 + j * 100, 350 - i * 100, 0);
+        currentCell.transform.localPosition = new Vector3(-350 / 2 + j * 50, 350 / 2 - i * 50, 0);
 
         // Creating the chess sprite game object:
         GameObject chessSprite = new GameObject();
@@ -258,6 +251,7 @@ public class Board : MonoBehaviour
         {
             // Assigning the sprite to the game object:
             chessSprite.GetComponent<Image>().sprite = chessSprites[charToSpriteIndex[type]];
+            chessSprite.GetComponent<Image>().rectTransform.sizeDelta = new Vector2(45, 45);
         }
 
         else
@@ -302,5 +296,17 @@ public class Board : MonoBehaviour
 
         // Switching to the menu scene:
         this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.MENU_SCENE_COUNT);
+    }
+
+    private void GameOver(string status, Color32 titleColor, Color32 textColor)
+    {
+        // Opening the popup window:
+        popupWindow.GetComponent<PopupWindow>().SetProperties("Results", status, titleColor, textColor);
+        popupWindow.SetActive(true);
+
+        // Assigning the exit button labels:
+        returnButtonSignResign.SetActive(false);
+        returnButtonSignLeave.SetActive(true);
+        returnButtonText.text = "Leave";
     }
 }

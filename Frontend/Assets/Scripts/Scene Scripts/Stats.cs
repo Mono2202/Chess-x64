@@ -14,6 +14,7 @@ public class Stats : MonoBehaviour
     void Start()
     {
         // Inits:
+        statsLables[0].text += Data.instance.username;
         communicator = Data.instance.communicator;
         string[] stats;
 
@@ -25,9 +26,9 @@ public class Stats : MonoBehaviour
         stats = response.Statistics.Split(new string[] { ", " }, StringSplitOptions.None);
 
         // Assigning the labels:
-        for (int i = 0; i < statsLables.Count; i++)
+        for (int i = 1; i < stats.Length + 1; i++)
         {
-            statsLables[i].text = stats[i];
+            statsLables[i].text = stats[i - 1];
         }
     }
 }

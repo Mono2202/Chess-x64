@@ -83,7 +83,7 @@ void LoginManager::signup(const string& username, const string& password, const 
 	}
 
 	// Condition: password doesn't match regex
-	std::regex passwordReg("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]{8,8}$");
+	std::regex passwordReg("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]{8,}$");
 	if (!std::regex_match(password, passwordReg)) {
 		throw std::exception("Password doesn't match requirements\n");
 	}

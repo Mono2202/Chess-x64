@@ -11,10 +11,6 @@
 // Defines:
 #define INITIAL_E 3
 
-// Constants: //TODO: CHANGE TO BIG NUMBERS
-const double q = 13;
-const double p = 11;
-
 // Using:
 using std::string;
 

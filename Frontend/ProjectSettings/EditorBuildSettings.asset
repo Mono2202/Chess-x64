@@ -13,10 +13,10 @@ EditorBuildSettings:
     guid: 4177115ebe36e694d96e244d24b2b6e8
   - enabled: 1
     path: Assets/Scenes/Register.unity
-    guid: 510ad9da5b71b7e41a1eb93d8700f19e
+    guid: d8eaeda341ed6d44a82b682fe5da2f76
   - enabled: 1
     path: Assets/Scenes/Menu.unity
-    guid: ea8f8a360b9ac334dbb0298dcecc573f
+    guid: b76f12fd9c9cd37428a5271a7dfb00cc
   - enabled: 1
     path: Assets/Scenes/Searching.unity
     guid: 6a4ad724eac5f5e4c9aa5a14f0c4d1d8
@@ -24,12 +24,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Game.unity
     guid: b7a94d32991ac7a44a936c971da47e68
   - enabled: 1
-    path: Assets/Scenes/Stats.unity
-    guid: 8630bccad04f9d8479c8e0c8744cf2bc
+    path: Assets/Scenes/Profile.unity
+    guid: dc67865f0f097bc4aae325f6d9e5901d
   - enabled: 1
     path: Assets/Scenes/BoardEditor.unity
-    guid: 8faffdc40d5f9ad468f4aee8022f15aa
-  - enabled: 1
-    path: Assets/Scenes/Loading.unity
-    guid: 5843caa8d656e61479fe4442d010808a
+    guid: ad208b4482d753e4f818833bbccca0fb
   m_configObjects: {}

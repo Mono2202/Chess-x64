@@ -14,7 +14,7 @@ public class BoardEditor : MonoBehaviour
     public Transform canvas;
     public InputField turnInput;
     public Text bestMoveText;
-    public Text addPieceText;
+    public InputField addPieceInput;
     public List<Sprite> chessSprites = new List<Sprite>();
     [HideInInspector] public GameObject[,] guiBoardArr = new GameObject[BOARD_SIZE, BOARD_SIZE];
     [HideInInspector] public Piece[,] boardArr = new Piece[BOARD_SIZE, BOARD_SIZE];
@@ -23,6 +23,7 @@ public class BoardEditor : MonoBehaviour
     [HideInInspector] public bool turnChanged;
     [HideInInspector] public string currentTurn;
     [HideInInspector] public string currentMove = "";
+    [HideInInspector] public string currentNewPiece = "";
 
     // Constants:
     public const int BOARD_SIZE = 8;
@@ -123,7 +124,7 @@ public class BoardEditor : MonoBehaviour
 
             catch
             {
-
+                return;
             }
         }
 
@@ -138,7 +139,7 @@ public class BoardEditor : MonoBehaviour
 
             catch
             {
-
+                return;
             }
         }
 
@@ -147,6 +148,14 @@ public class BoardEditor : MonoBehaviour
 
         // Setting the best move:
         bestMoveText.text = currentMove;
+
+        // Condition: new piece
+        if (addPieceInput.text.Length == 3)
+        {
+            currentNewPiece = addPieceInput.text;
+            addPieceInput.text = "";
+            AddPiece();
+        }
     }
 
     private void UseEngine()
@@ -248,7 +257,7 @@ public class BoardEditor : MonoBehaviour
         currentCell.transform.SetParent(canvas, false);
 
         // Positioning the cell:
-        currentCell.transform.localPosition = new Vector3(-350 + j * 100, 350 - i * 100, 0);
+        currentCell.transform.localPosition = new Vector3(-350 / 2 + j * 50, 350 / 2 - i * 50, 0);
 
         // Creating the chess sprite game object:
         GameObject chessSprite = new GameObject();
@@ -259,6 +268,7 @@ public class BoardEditor : MonoBehaviour
         {
             // Assigning the sprite to the game object:
             chessSprite.GetComponent<Image>().sprite = chessSprites[charToSpriteIndex[type]];
+            chessSprite.GetComponent<Image>().rectTransform.sizeDelta = new Vector2(45, 45);
         }
 
         else
@@ -304,16 +314,15 @@ public class BoardEditor : MonoBehaviour
         try
         {
             // Setting the position
-            print(addPieceText.text);
-            Position pos = new Position(addPieceText.text[2] - '1', addPieceText.text[1] - 'a');
+            Position pos = new Position(currentNewPiece[2] - '1', currentNewPiece[1] - 'a');
 
             // Changing the GUI:
             Destroy(guiBoardArr[pos.row, pos.col]);
             guiBoardArr[pos.row, pos.col] = CreateCell(pos.row, pos.col,
-                addPieceText.text[0]);
+                currentNewPiece[0]);
 
             // Changing the board array:
-            boardArr[pos.row, pos.col] = CreatePiece(addPieceText.text[0], pos);
+            boardArr[pos.row, pos.col] = CreatePiece(currentNewPiece[0], pos);
 
             // Using the engine:
             try
@@ -324,7 +333,7 @@ public class BoardEditor : MonoBehaviour
 
             catch
             {
-
+                return;
             }
         }
 

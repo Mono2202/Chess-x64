@@ -7,6 +7,7 @@ public class Login : MonoBehaviour
     public InputField usernameInput;
     public InputField passwordInput;
     public Button signInButton;
+    public Text signInButtonText;
     public GameObject popupWindow;
     private Communicator communicator;
 
@@ -20,6 +21,7 @@ public class Login : MonoBehaviour
     {
         // Checking if fields were filled:
         signInButton.interactable = !(usernameInput.text == "" || passwordInput.text == "");
+        signInButtonText.color = !(usernameInput.text == "" || passwordInput.text == "") ? new Color32(31, 194, 18, 255) : new Color32(31, 194, 18, 100);
     }
 
     public void SendLoginMessage()

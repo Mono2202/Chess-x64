@@ -8,6 +8,7 @@ public class Register : MonoBehaviour
     public InputField passwordInput;
     public InputField emailInput;
     public Button signUpButton;
+    public Text signUpButtonText;
     public GameObject popupWindow;
     private Communicator communicator;
 
@@ -22,6 +23,7 @@ public class Register : MonoBehaviour
     {
         // Checking if fields were filled:
         signUpButton.interactable = !(usernameInput.text == "" || passwordInput.text == "" || emailInput.text == "");
+        signUpButtonText.color = !(usernameInput.text == "" || passwordInput.text == "" || emailInput.text == "") ? new Color32(31, 194, 18, 255) : new Color32(31, 194, 18, 100);
     }
 
     public void SendRegisterMessage()
