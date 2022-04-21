@@ -34,13 +34,22 @@ void Room::setCurrentMove(string move)
 		std::random_shuffle(users.begin(), users.end());
 
 		// Choosing the starting color for each player
-		//this->m_metadata.currentMove = users[0] + "&&&W&&&" + users[1] + "&&&B";	
-		this->m_metadata.currentMove = "Ron&&&W&&&Yoni&&&B";	
+		this->m_metadata.currentMove = users[0] + "&&&W&&&" + users[1] + "&&&B";	
 	}
 
 	else {
 		this->m_metadata.currentMove = move;
 	}
+}
+
+/*
+Getting the current move
+Input : move - the move
+Output: < None >
+*/
+string Room::getCurrentMove() const
+{
+	return this->m_metadata.currentMove;
 }
 
 /*

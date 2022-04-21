@@ -91,8 +91,12 @@ RequestResult RoomRequestHandler::leaveRoom(RequestInfo request)
         m_roomManager.getRoom(m_room.getRoomData().id)->setCurrentMove("OPPONENT LEFT");
         m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false);
 
+        // Getting the other player:
+        string otherUser = (m_room.getAllUsers()[0] != m_user.getUsername()) ? m_room.getAllUsers()[0] : m_room.getAllUsers()[1];
+
         // Adding the stats:
-        m_roomManager.getDatabase()->addStatistics(m_user.getUsername(), WON_GAME);
+        m_roomManager.getDatabase()->addStatistics(m_user.getUsername(), LOST_GAME);
+        m_roomManager.getDatabase()->addStatistics(otherUser, WON_GAME);
         std::cout << "Win\n";
     }
 
@@ -108,7 +112,7 @@ RequestResult RoomRequestHandler::leaveRoom(RequestInfo request)
 
     // Creating result:
     result.buffer = JsonResponsePacketSerializer::serializeResponse(response);
-    result.newHandler = m_handlerFactory.createMenuRequestHandler(m_user);;
+    result.newHandler = m_handlerFactory.createMenuRequestHandler(m_user);
     return result;
 }
 

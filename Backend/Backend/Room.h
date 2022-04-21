@@ -35,6 +35,7 @@ public:
 	void setIsActive(unsigned int flag);
 	bool getIsActive() const;
 	void setCurrentMove(string move);
+	string getCurrentMove() const;
 	void addUser(LoggedUser user);
 	void removeUser(LoggedUser user);
 	vector<string> getAllUsers() const;

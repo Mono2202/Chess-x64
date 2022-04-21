@@ -153,6 +153,7 @@
     <ClInclude Include="Room.h" />
     <ClInclude Include="RoomManager.h" />
     <ClInclude Include="RoomRequestHandler.h" />
+    <ClInclude Include="RSA.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="sqlite3.h" />
     <ClInclude Include="SqliteDataBase.h" />
@@ -171,6 +172,7 @@
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="RoomManager.cpp" />
     <ClCompile Include="RoomRequestHandler.cpp" />
+    <ClCompile Include="RSA.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="sqlite3.c" />

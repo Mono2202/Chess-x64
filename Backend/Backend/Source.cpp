@@ -3,6 +3,7 @@
 // Includes:
 #include "WSAInitializer.h"
 #include "Server.h"
+#include "RSA.h"
 #include <iostream>
 #include <fstream>
 
