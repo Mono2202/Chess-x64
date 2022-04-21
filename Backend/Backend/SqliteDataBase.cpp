@@ -139,7 +139,7 @@ Output: < None >
 void SqliteDataBase::addNewUser(const string& username, const string& password, const string& email)
 {
 	// Inits:
-	string usersQuery = "INSERT INTO USERS VALUES ('" + username + "', '" + RSA::encrypt(password) + "', '" + email + "');";
+	string usersQuery = "INSERT INTO USERS VALUES ('" + username + "', '" + RSA::encrypt(password) + "', '" + RSA::encrypt(email) + "');";
 	string statsQuery = "INSERT INTO STATISTICS VALUES ('" + username + "', 0, 0, 0, 0, 1000);";
 	char* errMsg = NULL;
 
