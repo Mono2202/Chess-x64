@@ -234,7 +234,7 @@ public class Board : MonoBehaviour
 
         // Changing the cell's color: TODO
         //currentCell.GetComponent<Image>().color = (((i + j) % 2 == 0) /*== Data.instance.isWhite*/) ? new Color32(65, 65, 65, 255) : new Color32(8, 171, 0, 255);
-        currentCell.GetComponent<Image>().color = (((i + j) % 2 == 0) /*== Data.instance.isWhite*/) ? new Color32(255, 255, 255, 255) : new Color32(65, 65, 65, 255);
+        currentCell.GetComponent<Image>().color = (((i + j) % 2 == 0) /*== Data.instance.isWhite*/) ? Data.instance.whiteSquareColor : Data.instance.blackSquareColor;
 
         // Changing the cell's parent:
         currentCell.transform.SetParent(canvas, false);

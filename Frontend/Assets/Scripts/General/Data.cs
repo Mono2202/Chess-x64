@@ -10,6 +10,8 @@ public class Data : MonoBehaviour
     public Communicator communicator;
     public string username;
     public bool isWhite = true;
+    public Color32 whiteSquareColor = new Color32(255, 255, 255, 255);
+    public Color32 blackSquareColor = new Color32(65, 65, 65, 255);
 
     // Constants:
     public const int LOGIN_SCENE_INDEX = 1;
@@ -42,5 +44,11 @@ public class Data : MonoBehaviour
     void OnApplicationQuit()
     {
         instance.communicator.Write("EXIT");
+    }
+
+    public void ResetSquareColors()
+    {
+        whiteSquareColor = new Color32(255, 255, 255, 255);
+        blackSquareColor = new Color32(65, 65, 65, 255);
     }
 }

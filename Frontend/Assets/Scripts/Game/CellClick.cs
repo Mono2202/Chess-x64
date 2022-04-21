@@ -17,7 +17,7 @@ public class CellClick : MonoBehaviour
         {
             for (int j = 0; j < Board.BOARD_SIZE; j++)
             {
-                boardScript.guiBoardArr[i, j].GetComponent<Image>().color = (((i + j) % 2 == 0) /*== Data.instance.isWhite*/) ? new Color32(255, 255, 255, 255) : new Color32(65, 65, 65, 255);
+                boardScript.guiBoardArr[i, j].GetComponent<Image>().color = (((i + j) % 2 == 0) /*== Data.instance.isWhite*/) ? Data.instance.whiteSquareColor : Data.instance.blackSquareColor;
             }
         }
 
