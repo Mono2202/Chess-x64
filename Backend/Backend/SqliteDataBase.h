@@ -3,9 +3,12 @@
 // Includes:
 #include <iostream>
 #include <time.h>
+#include <regex>
+#include <string>
 #include "IDatabase.h"
 #include "sqlite3.h"
 #include "io.h"
+#include "RSA.h"
 
 // Defines:
 #define DB_DOESNT_EXIST -1
@@ -59,4 +62,5 @@ private:
 	static int outputExistsCallback(void* data, int argc, char** argv, char** azColName);
 	static int intNumCallback(void* data, int argc, char** argv, char** azColName);
 	static int scoreCallback(void* data, int argc, char** argv, char** azColName);
+	static int getPasswordCallback(void* data, int argc, char** argv, char** azColName);
 };

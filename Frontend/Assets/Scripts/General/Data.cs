@@ -36,7 +36,7 @@ public class Data : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         // Switching to the login scene:
-        SceneManager.LoadScene(LOADING_SCENE_COUNT);
+        SceneManager.LoadScene(LOGIN_SCENE_INDEX);
     }
 
     void OnApplicationQuit()

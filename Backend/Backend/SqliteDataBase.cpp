@@ -109,17 +109,22 @@ Output: found	 - whether the password matches to the username
 bool SqliteDataBase::doesPasswordMatch(const string& username, const string& password)
 {
 	// Inits:
-	string query = "SELECT * FROM USERS WHERE username='" + username + "' AND password='" + password + "';";
+	string query = "SELECT password FROM USERS WHERE username='" + username + "';";
 	char* errMsg = NULL;
-	bool found = false;
+	string dbPassword;
 
 	// Checking whether the password matches to the username:
-	if (sqlite3_exec(m_db, query.c_str(), outputExistsCallback, &found, &errMsg)) {
+	if (sqlite3_exec(m_db, query.c_str(), getPasswordCallback, &dbPassword, &errMsg)) {
 		std::cerr << "SQL ERROR: " << errMsg << "\n";
 	}
 
-	// Returning the result:
-	return found;
+	// Condition: matching passwords
+	if (RSA::decrypt(dbPassword) == password) {
+		return true;
+	}
+
+	// Condition: password doesn't match
+	return false;
 }
 
 // Actions:
@@ -134,7 +139,7 @@ Output: < None >
 void SqliteDataBase::addNewUser(const string& username, const string& password, const string& email)
 {
 	// Inits:
-	string usersQuery = "INSERT INTO USERS VALUES ('" + username + "', '" + password + "', '" + email + "');";
+	string usersQuery = "INSERT INTO USERS VALUES ('" + username + "', '" + RSA::encrypt(password) + "', '" + email + "');";
 	string statsQuery = "INSERT INTO STATISTICS VALUES ('" + username + "', 0, 0, 0, 0, 1000);";
 	char* errMsg = NULL;
 
@@ -143,7 +148,7 @@ void SqliteDataBase::addNewUser(const string& username, const string& password, 
 		std::cerr << "SQL ERROR: " << errMsg << "\n";
 	}
 
-	// Adding a new user to the DB stats:
+	// Adding new stats to the DB stats:
 	if (sqlite3_exec(m_db, statsQuery.c_str(), nullptr, nullptr, &errMsg)) {
 		std::cerr << "SQL ERROR: " << errMsg << "\n";
 	}
@@ -368,6 +373,21 @@ int SqliteDataBase::scoreCallback(void* data, int argc, char** argv, char** azCo
 	// Adding username with score:
 	if (argc > 1) {
 		score->push_back(std::string(argv[0]) + " : " + std::string(argv[1]));
+	}
+
+	return 0;
+}
+
+/*
+Callback to get password from USERS table
+*/
+int SqliteDataBase::getPasswordCallback(void* data, int argc, char** argv, char** azColName)
+{
+	// Inits:
+	string* password = static_cast<string*>(data);
+
+	if (argc > 0) {
+		*password = std::string(argv[0]);
 	}
 
 	return 0;

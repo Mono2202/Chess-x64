@@ -12,9 +12,6 @@ public class Login : MonoBehaviour
 
     void Start()
     {
-        // Hiding top bar:
-        BorderlessWindow.SetFramelessWindow();
-
         // Inits:
         communicator = Data.instance.communicator;
     }
