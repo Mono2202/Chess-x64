@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,6 +18,8 @@ public class Data : MonoBehaviour
     public const int SEARCHING_SCENE_COUNT = 4;
     public const int GAME_SCENE_COUNT = 5;
     public const int STATS_SCENE_COUNT = 6;
+    public const int BOARD_EDITOR_SCENE_COUNT = 7;
+    public const int LOADING_SCENE_COUNT = 8;
 
     public const float DELAY_TIME = 0.5f;
 
@@ -33,11 +36,11 @@ public class Data : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         // Switching to the login scene:
-        SceneManager.LoadScene(LOGIN_SCENE_INDEX);
+        SceneManager.LoadScene(LOADING_SCENE_COUNT);
     }
 
     void OnApplicationQuit()
     {
-        instance.communicator.Write("ERROR");
+        instance.communicator.Write("EXIT");
     }
 }
