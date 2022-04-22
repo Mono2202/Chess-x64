@@ -183,6 +183,25 @@ Buffer JsonResponsePacketSerializer::serializeResponse(const SearchPrivateRoomRe
 	return insertData(data, SEARCH_PRIVATE_ROOM_RESPONSE, response.status);
 }
 
+Buffer JsonResponsePacketSerializer::serializeResponse(const GetMatchHistoryResponse& response)
+{
+	// Inits:
+	json data;
+	string gamesList = "";
+	int i = 0;
+
+	// Concatenating the players vector to a string:
+	for (i = 0; i < response.games.size(); i++) {
+		gamesList += response.games[i] + "@@";
+	}
+
+	// Building the data:
+	data["Games"] = gamesList.substr(0, gamesList.size() - 2);
+
+	// Building the buffer:
+	return insertData(data, GET_MATCH_HISTORY_RESPONSE, response.status);
+}
+
 
 // Private Static Methods:
 

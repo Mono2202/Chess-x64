@@ -102,6 +102,13 @@ class SearchPrivateRoomResponse
     public int RoomID { get; set; }
 }
 
+// GetMatchHistoryResponse Class:
+class GetMatchHistoryResponse
+{
+    public int Status { get; set; }
+    public string Games { get; set; }
+}
+
 class Deserializer
 {
     // Constants:

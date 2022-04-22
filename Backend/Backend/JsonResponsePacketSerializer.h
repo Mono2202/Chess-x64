@@ -24,7 +24,8 @@ enum ResponseCode
 	GET_ROOM_STATE_RESPONSE,
 	LEAVE_ROOM_RESPONSE,
 	SUBMIT_MOVE_RESPONSE,
-	SEARCH_PRIVATE_ROOM_RESPONSE
+	SEARCH_PRIVATE_ROOM_RESPONSE,
+	GET_MATCH_HISTORY_RESPONSE
 };
 
 // Using:
@@ -123,6 +124,12 @@ typedef struct SearchPrivateRoomResponse {
 	RoomData roomData;
 } SearchPrivateRoomResponse;
 
+// GetMatchHistoryResponse Struct:
+typedef struct GetMatchHistoryResponse {
+	unsigned int status;
+	vector<string> games;
+} GetMatchHistoryResponse;
+
 // JsonResponsePacketSerializer Class:
 class JsonResponsePacketSerializer
 {
@@ -143,6 +150,7 @@ public:
 	static Buffer serializeResponse(const LeaveRoomResponse& response);
 	static Buffer serializeResponse(const SubmitMoveResponse& response);
 	static Buffer serializeResponse(const SearchPrivateRoomResponse& response);
+	static Buffer serializeResponse(const GetMatchHistoryResponse& response);
 
 private:
 	// Private Static Methods:

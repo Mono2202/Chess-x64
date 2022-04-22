@@ -89,6 +89,18 @@ SearchPrivateRoomRequest JsonRequestPacketDeserializer::deserializeSearchPrivate
     return request;
 }
 
+GetMatchHistoryRequest JsonRequestPacketDeserializer::deserializeGetMatchHistoryRequest(Buffer& buffer)
+{
+    // Inits:
+    GetMatchHistoryRequest request;
+    json data = getJsonData(buffer);
+
+    // Building the request:
+    request.username = data["Username"];
+
+    return request;
+}
+
 
 // Private Static Methods:
 

@@ -20,7 +20,7 @@ bool MenuRequestHandler::isRequestRelevant(RequestInfo request)
 {
     // Condition: relevant request
     if ((request.buffer[0] >= LOGOUT_REQUEST && request.buffer[0] <= SEARCH_ELO_ROOM_REQUEST) ||
-        request.buffer[0] == SEARCH_PRIVATE_ROOM_REQUEST) {
+        request.buffer[0] == SEARCH_PRIVATE_ROOM_REQUEST || request.buffer[0] == GET_MATCH_HISTORY_REQUEST) {
         return true;
     }
 
@@ -46,6 +46,7 @@ RequestResult MenuRequestHandler::handleRequest(RequestInfo request)
     case CREATE_ROOM_REQUEST:           return createRoom(request);
     case SEARCH_ELO_ROOM_REQUEST:       return searchEloRoom(request);
     case SEARCH_PRIVATE_ROOM_REQUEST:   return searchPrivateRoom(request);
+    case GET_MATCH_HISTORY_REQUEST:     return getMatchHistory(request);
     }
 }
 
@@ -233,6 +234,19 @@ RequestResult MenuRequestHandler::searchPrivateRoom(RequestInfo request)
     RequestResult result;
     SearchPrivateRoomRequest searchRequest = JsonRequestPacketDeserializer::deserializeSearchPrivateRoomRequest(request.buffer);
     SearchPrivateRoomResponse response = { SUCCESS_STATUS, m_roomManager.getPrivateRoom(searchRequest.roomCode) };
+
+    // Creating Result:
+    result.buffer = JsonResponsePacketSerializer::serializeResponse(response);
+    result.newHandler = nullptr;
+    return result;
+}
+
+RequestResult MenuRequestHandler::getMatchHistory(RequestInfo request)
+{
+    // Inits:
+    RequestResult result;
+    GetMatchHistoryRequest searchRequest = JsonRequestPacketDeserializer::deserializeGetMatchHistoryRequest(request.buffer);
+    GetMatchHistoryResponse response = { SUCCESS_STATUS, m_handlerFactory.m_database->getGames(searchRequest.username)};
 
     // Creating Result:
     result.buffer = JsonResponsePacketSerializer::serializeResponse(response);

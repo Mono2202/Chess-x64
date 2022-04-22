@@ -55,6 +55,11 @@ typedef struct SearchPrivateRoomRequest {
 	string roomCode;
 } SearchPrivateRoomRequest;
 
+// GetMatchHistoryRequest Struct:
+typedef struct GetMatchHistoryRequest {
+	string username;
+} GetMatchHistoryRequest;
+
 // JsonRequestPacketDeserializer Class:
 class JsonRequestPacketDeserializer
 {
@@ -67,6 +72,7 @@ public:
 	static CreateRoomRequest deserializeCreateRoomRequest(Buffer& buffer);
 	static SubmitMoveRequest deserializeSubmitMoveRequest(Buffer& buffer);
 	static SearchPrivateRoomRequest deserializeSearchPrivateRoomRequest(Buffer& buffer);
+	static GetMatchHistoryRequest deserializeGetMatchHistoryRequest(Buffer& buffer);
 
 private:
 	// Private Static Methods:

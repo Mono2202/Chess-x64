@@ -27,7 +27,7 @@ class Room
 {
 public:
 	// C'tors & D'tors:
-	Room() = default;
+	Room();
 	Room(const RoomData& data);
 	~Room() = default;
 
@@ -36,6 +36,11 @@ public:
 	bool getIsActive() const;
 	void setCurrentMove(string move);
 	string getCurrentMove() const;
+	void addMove(const string& move);
+	string getMoves() const;
+	vector<string> getUsernames() const;
+	void setWinner(const string& username);
+	string getWinner() const;
 	void addUser(LoggedUser user);
 	void removeUser(LoggedUser user);
 	vector<string> getAllUsers() const;
@@ -45,4 +50,8 @@ private:
 	// Fields:
 	RoomData m_metadata;
 	vector<LoggedUser> m_users;
+	string moves;
+	string whiteUsername;
+	string blackUsername;
+	string wonUsername;
 };

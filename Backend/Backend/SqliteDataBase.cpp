@@ -34,7 +34,9 @@ bool SqliteDataBase::open()
 	// Inits:
 	string query = "CREATE TABLE USERS(username TEXT NOT NULL PRIMARY KEY, password TEXT NOT NULL, email TEXT NOT NULL);\n\
 					CREATE TABLE STATISTICS(username TEXT NOT NULL PRIMARY KEY,\
-					totalGames INTEGER NOT NULL, gamesWon INTEGER NOT NULL, gamesLost INTEGER NOT NULL, gamesTied INTEGER NOT NULL, elo INTEGER NOT NULL);";
+					totalGames INTEGER NOT NULL, gamesWon INTEGER NOT NULL, gamesLost INTEGER NOT NULL, gamesTied INTEGER NOT NULL, elo INTEGER NOT NULL);\n\
+					CREATE TABLE GAMES(whiteUsername TEXT NOT NULL, blackUsername TEXT NOT NULL, game TEXT NOT NULL, wonUsername TEXT NOT NULL,\
+					date TEXT NOT NULL);";
 	string dbFile = "ChessDB.db";
 	char* errMsg = NULL;
 	int res = _access(dbFile.c_str(), 0);
@@ -75,9 +77,7 @@ void SqliteDataBase::close()
 }
 
 
-/* Users Table */
-
-// Queries:
+// Users Table:
 
 /*
 Checking whether a user exists
@@ -127,8 +127,6 @@ bool SqliteDataBase::doesPasswordMatch(const string& username, const string& pas
 	return false;
 }
 
-// Actions:
-
 /*
 Adding a new user to the DB
 Input : username - the username
@@ -155,9 +153,7 @@ void SqliteDataBase::addNewUser(const string& username, const string& password, 
 }
 
 
-/* Statistics Table */
-
-// Queries:
+// Statistics Table:
 
 /*
 Getting a player's number of games won
@@ -287,11 +283,9 @@ vector<string> SqliteDataBase::getHighScores()
 
 /*
 Adding stats
-Input : < None >
-Output: username	   - the username
-		averageTime	   - the avg time
-		correctAnswers - amount of correct answers
-		totalAnswers   - total answers count
+Input : username   - the username
+		gameStatus - whether won / lost / tied
+Output: < None >
 */
 void SqliteDataBase::addStatistics(const string& username, int gameStatus)
 {
@@ -329,6 +323,48 @@ void SqliteDataBase::addStatistics(const string& username, int gameStatus)
 	if (sqlite3_exec(m_db, query.c_str(), nullptr, nullptr, &errMsg)) {
 		std::cerr << "SQL ERROR: " << errMsg << "\n";
 	}
+}
+
+/*
+Adding a game
+Input : whiteUsername - the white username
+		blackUsername - the black username
+		game		  - the game string
+Output: < None >
+*/
+void SqliteDataBase::addGame(const string& whiteUsername, const string& blackUsername, const string& game,
+	const string& wonUsername, const string& date)
+{
+	// Inits
+	string query = "INSERT INTO GAMES VALUES('" + whiteUsername + "', '" + blackUsername + "', '" + game + "', '" + wonUsername +
+		"', '" + date + "');";
+	char* errMsg = NULL;
+
+	// Adding the game:
+	if (sqlite3_exec(m_db, query.c_str(), nullptr, nullptr, &errMsg)) {
+		std::cerr << "SQL ERROR: " << errMsg << "\n";
+	}
+}
+
+/*
+Getting user's games
+Input : username - the username
+Output: 
+*/
+vector<string> SqliteDataBase::getGames(const string& username)
+{
+	// Inits:
+	string query = "SELECT * FROM GAMES WHERE whiteUsername='" + username + "' OR blackUsername='" + username + "';";
+	char* errMsg = NULL;
+	vector<string> games;
+
+	// Getting the player's games:
+	if (sqlite3_exec(m_db, query.c_str(), gamesCallback, &games, &errMsg)) {
+		std::cerr << "SQL ERROR: " << errMsg << "\n";
+	}
+
+	// Returning the result:
+	return games;
 }
 
 
@@ -388,6 +424,20 @@ int SqliteDataBase::getPasswordCallback(void* data, int argc, char** argv, char*
 
 	if (argc > 0) {
 		*password = std::string(argv[0]);
+	}
+
+	return 0;
+}
+
+int SqliteDataBase::gamesCallback(void* data, int argc, char** argv, char** azColName)
+{
+	// Inits:
+	vector<string>* games = static_cast<vector<string>*>(data);
+
+	// Adding current game:
+	if (argc > 0) {
+		games->push_back(std::string(argv[0]) + "&&&" + std::string(argv[1]) + "&&&" + std::string(argv[2]) + "&&&" + std::string(argv[3]) +
+			"&&&" + std::string(argv[4]));
 	}
 
 	return 0;

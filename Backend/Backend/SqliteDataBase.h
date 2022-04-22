@@ -28,20 +28,13 @@ public:
 	virtual bool open();
 	virtual void close();
 
-
-	/* Users Table */
-
-	// Queries:
+	// Users Table:
 	virtual bool doesUserExist(const string& username);
 	virtual bool doesPasswordMatch(const string& username, const string& password);
-
-	// Actions:
 	virtual void addNewUser(const string& username, const string& password, const string& email);
 
 
-	/* Statistics Table */
-
-	// Queries:
+	// Statistics Table:
 	virtual int getNumOfPlayerWins(const string& username);
 	virtual int getNumOfPlayerLosses(const string& username);
 	virtual int getNumOfPlayerTies(const string& username);
@@ -49,6 +42,11 @@ public:
 	virtual int getPlayerElo(const string& username);
 	virtual vector<string> getHighScores();
 	virtual void addStatistics(const string& username, int gameStatus);
+
+	// Games Table:
+	virtual void addGame(const string& whiteUsername, const string& blackUsername, const string& game,
+		const string& wonUsername, const string& date);
+	virtual vector<string> getGames(const string& username);
 
 private:
 	// Private C'tor:
@@ -63,4 +61,5 @@ private:
 	static int intNumCallback(void* data, int argc, char** argv, char** azColName);
 	static int scoreCallback(void* data, int argc, char** argv, char** azColName);
 	static int getPasswordCallback(void* data, int argc, char** argv, char** azColName);
+	static int gamesCallback(void* data, int argc, char** argv, char** azColName);
 };

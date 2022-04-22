@@ -28,8 +28,6 @@ public class Play : MonoBehaviour
 
     public void JoinPrivateRoom()
     {
-        print(roomCodeInput.text);
-
         // Sending the search private room request:
         communicator.Write(Serializer.SerializeRequest<SearchPrivateRoomRequest>(new SearchPrivateRoomRequest { RoomCode = roomCodeInput.text }, Serializer.SEARCH_PRIVATE_ROOM_REQUEST));
 
