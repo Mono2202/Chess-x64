@@ -29,7 +29,7 @@ public class CellClick : MonoBehaviour
             Dictionary<string, Position> moves = boardScript.boardArr[row, col].GetLegalMoves(boardScript.boardArr, boardScript.currentMove);
             foreach (KeyValuePair<string, Position> move in moves)
             {
-                boardScript.guiBoardArr[move.Value.row, move.Value.col].GetComponent<Image>().color = Color.red;
+                boardScript.guiBoardArr[move.Value.row, move.Value.col].GetComponent<Image>().color = new Color32(25, 25, 25, 100); // TODO: CHANGE TO DOTS
             }
 
             boardScript.selectedPiece = new Position(row, col);

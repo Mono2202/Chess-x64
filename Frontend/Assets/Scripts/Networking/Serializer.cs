@@ -60,6 +60,12 @@ class SubmitMoveRequest
     public string Move { get; set; }
 }
 
+// SearchPrivateRoomRequest Class:
+class SearchPrivateRoomRequest
+{
+    public string RoomCode { get; set; }
+}
+
 static class Serializer
 {
     // Constants:
@@ -76,6 +82,7 @@ static class Serializer
     public const int GET_ROOM_STATE_REQUEST = 111;
     public const int LEAVE_ROOM_REQUEST = 112;
     public const int SUBMIT_MOVE_REQUEST = 113;
+    public const int SEARCH_PRIVATE_ROOM_REQUEST = 114;
 
 
     // Methods:

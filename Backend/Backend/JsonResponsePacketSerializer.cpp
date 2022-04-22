@@ -115,8 +115,12 @@ Buffer JsonResponsePacketSerializer::serializeResponse(const JoinRoomResponse& r
 
 Buffer JsonResponsePacketSerializer::serializeResponse(const CreateRoomResponse& response)
 {
+	// Building the data:
+	json data;
+	data["RoomID"] = response.roomID;
+
 	// Building the buffer:
-	return insertData(json({}), CREATE_ROOM_RESPONSE, response.status);
+	return insertData(data, CREATE_ROOM_RESPONSE, response.status);
 }
 
 Buffer JsonResponsePacketSerializer::serializeResponse(const SearchEloRoomResponse& response)
@@ -164,6 +168,19 @@ Buffer JsonResponsePacketSerializer::serializeResponse(const SubmitMoveResponse&
 {
 	// Building the buffer:
 	return insertData(json({}), SUBMIT_MOVE_RESPONSE, response.status);
+}
+
+Buffer JsonResponsePacketSerializer::serializeResponse(const SearchPrivateRoomResponse& response)
+{
+	// Inits:
+	json data;
+	int i = 0;
+
+	// Building the data:
+	data["RoomID"] = response.roomData.id;
+
+	// Building the buffer:
+	return insertData(data, SEARCH_PRIVATE_ROOM_RESPONSE, response.status);
 }
 
 

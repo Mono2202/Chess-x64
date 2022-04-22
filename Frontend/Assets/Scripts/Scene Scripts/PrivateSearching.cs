@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class Searching : MonoBehaviour
+public class PrivateSearching : MonoBehaviour
 {
     // Fields:
+    public Text roomIdText;
     private Communicator communicator;
 
     // Start is called before the first frame update
@@ -12,37 +15,17 @@ public class Searching : MonoBehaviour
         // Inits:
         communicator = Data.instance.communicator;
 
-        // Sending the search ELO room request:
-        communicator.Write(Serializer.SerializeRequest<SearchEloRoomRequest>(new SearchEloRoomRequest { }, Serializer.SEARCH_ELO_ROOM_REQUEST));
+        // Sending the create room request:
+        communicator.Write(Serializer.SerializeRequest<CreateRoomRequest>(new CreateRoomRequest { GameMode = "P" }, Serializer.CREATE_ROOM_REQUEST));
 
         // Deserializing the response:
-        SearchEloRoomResponse response = Deserializer.DeserializeResponse<SearchEloRoomResponse>(communicator.Read());
+        CreateRoomResponse response = Deserializer.DeserializeResponse<CreateRoomResponse>(communicator.Read());
 
-        // Condition: room found
-        if (response.RoomID != 0)
-        {
-            // Sending the join room request:
-            communicator.Write(Serializer.SerializeRequest<JoinRoomRequest>(new JoinRoomRequest { RoomID = response.RoomID }, Serializer.JOIN_ROOM_REQUEST));
+        // Setting the room ID:
+        roomIdText.text = response.RoomID.ToString();
 
-            // Reading the response:
-            string msg = communicator.Read();
-
-            // Switching to the game scene:
-            this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.GAME_SCENE_COUNT);
-        }
-
-        // Condition: room not found, creating a new room
-        else
-        {
-            // Sending the request:
-            communicator.Write(Serializer.SerializeRequest<CreateRoomRequest>(new CreateRoomRequest { GameMode = "E" }, Serializer.CREATE_ROOM_REQUEST));
-
-            // Reading the response:
-            string msg = communicator.Read();
-
-            // Waiting for another player to join:
-            StartCoroutine(WaitForPlayer());
-        }
+        // Waiting for another player to join:
+        StartCoroutine(WaitForPlayer());
     }
 
     private IEnumerator WaitForPlayer()
@@ -65,6 +48,15 @@ public class Searching : MonoBehaviour
                 this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.GAME_SCENE_COUNT);
             }
         }
+    }
+
+    public void CopyToClipboard()
+    {
+        // Copying the room code to the clipboard:
+        TextEditor te = new TextEditor();
+        te.text = roomIdText.text;
+        te.SelectAll();
+        te.Copy();
     }
 
     public void ReturnToMenu()

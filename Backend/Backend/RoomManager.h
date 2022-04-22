@@ -25,6 +25,7 @@ public:
 	vector<RoomData> getRooms() const;
 	Room* getRoom(int ID);
 	RoomData getEloRoom() const;
+	RoomData getPrivateRoom(const string& roomCode) const;
 	IDatabase* getDatabase() const;
 
 private:

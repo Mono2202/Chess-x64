@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -22,6 +23,8 @@ public class Data : MonoBehaviour
     public const int STATS_SCENE_COUNT = 6;
     public const int BOARD_EDITOR_SCENE_COUNT = 7;
     public const int LOADING_SCENE_COUNT = 8;
+    public const int PLAY_SCENE_COUNT = 9;
+    public const int PRIVATE_SEARCHING_SCENE_COUNT = 10;
 
     public const float DELAY_TIME = 0.5f;
 
@@ -33,6 +36,18 @@ public class Data : MonoBehaviour
 
         // Creating the communicator object:
         instance.communicator = new Communicator();
+
+        // Condition: not first session
+        if (false) // TODO: CHANGE TO DB SETTINGS
+        {
+            LoadUserPrefrences();
+        }
+
+        // Condition: first session
+        else
+        {
+            ResetSquareColors();
+        }
 
         // Keeping the prefab loaded at all times:
         DontDestroyOnLoad(gameObject);
@@ -46,9 +61,14 @@ public class Data : MonoBehaviour
         instance.communicator.Write("EXIT");
     }
 
+    public void LoadUserPrefrences()
+    {
+    }
+
     public void ResetSquareColors()
     {
-        whiteSquareColor = new Color32(255, 255, 255, 255);
-        blackSquareColor = new Color32(65, 65, 65, 255);
+        // Setting the square colors:
+        instance.whiteSquareColor = new Color32(255, 255, 255, 255);
+        instance.blackSquareColor = new Color32(65, 65, 65, 255);
     }
 }

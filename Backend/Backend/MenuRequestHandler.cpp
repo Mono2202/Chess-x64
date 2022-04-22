@@ -19,7 +19,8 @@ Output: true	- relevant request
 bool MenuRequestHandler::isRequestRelevant(RequestInfo request)
 {
     // Condition: relevant request
-    if (request.buffer[0] >= LOGOUT_REQUEST && request.buffer[0] <= SEARCH_ELO_ROOM_REQUEST) {
+    if ((request.buffer[0] >= LOGOUT_REQUEST && request.buffer[0] <= SEARCH_ELO_ROOM_REQUEST) ||
+        request.buffer[0] == SEARCH_PRIVATE_ROOM_REQUEST) {
         return true;
     }
 
@@ -44,6 +45,7 @@ RequestResult MenuRequestHandler::handleRequest(RequestInfo request)
     case JOIN_ROOM_REQUEST:             return joinRoom(request);
     case CREATE_ROOM_REQUEST:           return createRoom(request);
     case SEARCH_ELO_ROOM_REQUEST:       return searchEloRoom(request);
+    case SEARCH_PRIVATE_ROOM_REQUEST:   return searchPrivateRoom(request);
     }
 }
 
@@ -194,6 +196,9 @@ RequestResult MenuRequestHandler::createRoom(RequestInfo request)
     m_roomManager.createRoom(m_user, data);
     response.status = SUCCESS_STATUS;
 
+    // Setting the room ID:
+    response.roomID = data.id;
+
     // Creating Result:
     result.buffer = JsonResponsePacketSerializer::serializeResponse(response);
     result.newHandler = m_handlerFactory.createRoomRequestHandler(m_user, *m_roomManager.getRoom(data.id));
@@ -210,6 +215,24 @@ RequestResult MenuRequestHandler::searchEloRoom(RequestInfo request)
     // Inits:
     RequestResult result;
     SearchEloRoomResponse response = { SUCCESS_STATUS, m_roomManager.getEloRoom() };
+
+    // Creating Result:
+    result.buffer = JsonResponsePacketSerializer::serializeResponse(response);
+    result.newHandler = nullptr;
+    return result;
+}
+
+/*
+Searching for a private room
+Input : request - the search private room request
+Output: result  - the request result
+*/
+RequestResult MenuRequestHandler::searchPrivateRoom(RequestInfo request)
+{
+    // Inits:
+    RequestResult result;
+    SearchPrivateRoomRequest searchRequest = JsonRequestPacketDeserializer::deserializeSearchPrivateRoomRequest(request.buffer);
+    SearchPrivateRoomResponse response = { SUCCESS_STATUS, m_roomManager.getPrivateRoom(searchRequest.roomCode) };
 
     // Creating Result:
     result.buffer = JsonResponsePacketSerializer::serializeResponse(response);

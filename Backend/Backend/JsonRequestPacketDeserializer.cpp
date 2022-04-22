@@ -77,6 +77,18 @@ SubmitMoveRequest JsonRequestPacketDeserializer::deserializeSubmitMoveRequest(Bu
     return request;
 }
 
+SearchPrivateRoomRequest JsonRequestPacketDeserializer::deserializeSearchPrivateRoomRequest(Buffer& buffer)
+{
+    // Inits:
+    SearchPrivateRoomRequest request;
+    json data = getJsonData(buffer);
+
+    // Building the request:
+    request.roomCode = data["RoomCode"];
+
+    return request;
+}
+
 
 // Private Static Methods:
 
