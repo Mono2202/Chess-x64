@@ -1,0 +1,69 @@
+- Encrypt SQL DB data
+- Encrypt communication
+- ELO Points, add to stats, do matchmaking
+- Random Matchmaking based on elo
+- Room creator
+- Add error messages with error windows
+- Add time controls
+- Add password to private room
+- Minimize window
+- Highlight buttons when hovering, change cursor
+- Theme of project to be coding / cyber
+- Add option to play with commands, e.g: move("k", "c" + (5+2)); script of multiple moves in a row
+- Add premoves option
+- Maybe: control with hands
+- Add chess pieces physics
+- Add themes
+- Handle dc mid game
+- Remove prints and TODO from code
+- Handle errors
+- Matrix theme, green and black. moving matrix text background, ascii pieces
+- Add loading screen back, but w/o it blocking clicks
+- 3D: add clock with time as model?
+- Matrix loading screen and background
+- Ranks associated with coding
+- send email verification
+- knight skin - trojan horse
+- pieces skins to be code/cyber related
+- font changer?
+- write moves in right of game like chess.com
+- add chat mid game
+- add friend system
+- change sprite list to get file name from code in game scene
+- add mouse over cursor effect
+- check after each write that there is a read in frontend comm with server
+- check sudden exit to act correctly in server and remove players
+- change black pov to switched board
+- option to switch board pov
+- if en passant delete the pawn
+- profile page
+- seperate elo for each mode
+- puzzles?
+- sound effects
+- settings -> change square colors with rgb, volume, custom pieces, custom font, show row col numbers
+- add sound effects
+- check if got update game message and then send again
+- board editor: insert fen
+- board editor: add pieces with right click
+- board flip visually
+- profile page, show name and icon, custom profile pic
+- MODERN CUSTOM TITLE BAR
+- finish loading screen
+- maximum chars to input, disable buffer overflow
+- tell what password requirements
+- hide password on input
+- add icons to buttons
+- add amount of moves, game analysis, result, date, all moves
+- profile: country, flag, pic, rating, stats
+- Add friend list? FRIENDS table, if friend logged in show as online
+- custom cursor from 4 chess related
+- limit input to 15 or something
+- custom starting board
+- disable spaces and special letters in username
+- add date to games history
+- watch games played
+- option to be private not see stats
+- show register requirements
+- IMPORTANT: SEND GAME STATE MESSAGE AFTER SUBMIT MOVE, INORDER
+  FOR GAME NOT TO LAG
+- IMPORTANT: TURN ALL SERVER COMMS TO THREADS IN UNITY
