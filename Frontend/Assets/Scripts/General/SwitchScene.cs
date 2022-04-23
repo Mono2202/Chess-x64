@@ -12,4 +12,10 @@ public class SwitchScene : MonoBehaviour
     {
         Application.Quit();
     }
+
+    public void SwitchToPersonalProfile()
+    {
+        Data.instance.profileUsername = Data.instance.username;
+        SceneManager.LoadScene(Data.STATS_SCENE_COUNT);
+    }
 }

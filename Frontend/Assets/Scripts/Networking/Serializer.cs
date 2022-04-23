@@ -31,7 +31,10 @@ class GetPlayersInRoomRequest
 class GetHighScoreRequest { }
 
 // GetPersonalStatsRequest Class:
-class GetPersonalStatsRequest { }
+class GetPersonalStatsRequest 
+{
+    public string Username { get; set; }
+}
 
 // JoinRoomRequest Class:
 class JoinRoomRequest

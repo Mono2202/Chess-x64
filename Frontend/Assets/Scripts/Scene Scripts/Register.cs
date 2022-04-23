@@ -33,7 +33,7 @@ public class Register : MonoBehaviour
 
         // Getting the response:
         string msg = communicator.Read();
-
+        print(msg);
         // Condition: error occured
         if (msg[0] == Deserializer.ERROR_RESPONSE)
         {

@@ -101,6 +101,18 @@ GetMatchHistoryRequest JsonRequestPacketDeserializer::deserializeGetMatchHistory
     return request;
 }
 
+GetPersonalStatsRequest JsonRequestPacketDeserializer::deserializeGetPersonalStatsRequest(Buffer& buffer)
+{
+    // Inits:
+    GetPersonalStatsRequest request;
+    json data = getJsonData(buffer);
+
+    // Building the request:
+    request.username = data["Username"];
+
+    return request;
+}
+
 
 // Private Static Methods:
 

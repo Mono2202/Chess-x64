@@ -19,7 +19,7 @@ public class MatchHistory : MonoBehaviour
         string[] games;
 
         // Sending the games request:
-        communicator.Write(Serializer.SerializeRequest<GetMatchHistoryRequest>(new GetMatchHistoryRequest { Username = Data.instance.username }, Serializer.GET_MATCH_HISTORY_REQUEST));
+        communicator.Write(Serializer.SerializeRequest<GetMatchHistoryRequest>(new GetMatchHistoryRequest { Username = Data.instance.profileUsername }, Serializer.GET_MATCH_HISTORY_REQUEST));
 
         // Deserializing the response:
         GetMatchHistoryResponse response = Deserializer.DeserializeResponse<GetMatchHistoryResponse>(communicator.Read());

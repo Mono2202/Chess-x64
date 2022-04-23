@@ -120,10 +120,11 @@ RequestResult MenuRequestHandler::getPersonalStats(RequestInfo request)
     // Inits:
     RequestResult result;
     GetPersonalStatsResponse response;
+    GetPersonalStatsRequest statsRequest = JsonRequestPacketDeserializer::deserializeGetPersonalStatsRequest(request.buffer);
 
     // Creating Response:
     response.status = SUCCESS_STATUS;
-    response.statistics = m_statisticsManager.getUserStatistics(m_user.getUsername());
+    response.statistics = m_statisticsManager.getUserStatistics(statsRequest.username);
 
     // Creating Result:
     result.buffer = JsonResponsePacketSerializer::serializeResponse(response);
