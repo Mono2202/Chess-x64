@@ -5,12 +5,12 @@
 /*
 Encrypting the message using RSA
 Input : message - the message to encrypt
-Output: 
+Output: result  - the encrypted message
 */
 string RSA::encrypt(const string& message)
 {
 	// Inits:
-	char buffer[128];
+	char buffer[SIZE];
 	string cmd = "python ./RSA.py e " + message;
 	std::string result = "";
 	
@@ -28,10 +28,15 @@ string RSA::encrypt(const string& message)
 	return result;
 }
 
+/*
+Decrypting the message using RSA
+Input : message - the message to decrypt
+Output: result  - the decrypted message
+*/
 string RSA::decrypt(const string& cipher)
 {
 	// Inits:
-	char buffer[128];
+	char buffer[SIZE];
 	string cmd = "python ./RSA.py d " + cipher;
 	std::string result = "";
 

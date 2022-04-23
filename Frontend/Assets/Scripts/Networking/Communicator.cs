@@ -7,6 +7,7 @@ public class Communicator
 {
     // Fields:
     private NetworkStream m_socket;
+    private AES m_aes;
 
     // Constants:
     private const string IP = "127.0.0.1";
@@ -17,6 +18,9 @@ public class Communicator
     // C'tor:
     public Communicator()
     {
+        // Inits:
+        m_aes = new AES();
+
         // Creating the socket with the server:
         try
         {
@@ -45,7 +49,7 @@ public class Communicator
         // Sending the message to the server:
         try
         {
-            byte[] buffer = new ASCIIEncoding().GetBytes(message);
+            byte[] buffer = new ASCIIEncoding().GetBytes(m_aes.AESEncrypt(message));
             m_socket.Write(buffer, 0, buffer.Length);
             m_socket.Flush();
         }
@@ -68,7 +72,8 @@ public class Communicator
         {
             byte[] buffer = new byte[SIZE];
             m_socket.Read(buffer, 0, SIZE);
-            return System.Text.Encoding.Default.GetString(buffer);
+            string data = System.Text.Encoding.UTF8.GetString(buffer);
+            return m_aes.AESDecrypt(data);
         }
 
         catch

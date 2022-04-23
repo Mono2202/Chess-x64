@@ -83,6 +83,12 @@ void LoginManager::signup(const string& username, const string& password, const 
 		throw std::exception("User already exists\n");
 	}
 
+	// Condition: username doesn't match regex
+	std::regex usernameReg("^(?=[a-zA-Z0-9._]{6,20}$)(?!.*[_.]{2})[^_.].*[^_.]$");
+	if (!std::regex_match(username, usernameReg)) {
+		throw std::exception("Username doesn't match requirements\n");
+	}
+
 	// Condition: password doesn't match regex
 	std::regex passwordReg("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]{8,}$");
 	if (!std::regex_match(password, passwordReg)) {

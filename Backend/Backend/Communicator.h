@@ -9,6 +9,7 @@
 #include "JsonResponsePacketSerializer.h"
 #include "JsonRequestPacketDeserializer.h"
 #include <WinSock2.h>
+#include "AES.h"
 
 // Defines:
 #define PORT 54321
@@ -45,4 +46,6 @@ private:
 	// Private Methods:
 	void bindAndListen();
 	void handleNewClient(SOCKET sock);
+	Buffer decryptPacket(Buffer buffer) const;
+	Buffer encryptPacket(Buffer buffer) const;
 };

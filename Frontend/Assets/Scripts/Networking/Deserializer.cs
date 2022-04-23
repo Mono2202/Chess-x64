@@ -112,7 +112,7 @@ class GetMatchHistoryResponse
 class Deserializer
 {
     // Constants:
-    public const int ERROR_RESPONSE = 2;
+    public const int ERROR_RESPONSE = 102;
 
     // Methods:
     public static T DeserializeResponse<T>(string buffer)

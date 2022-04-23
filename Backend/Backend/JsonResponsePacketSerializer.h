@@ -10,7 +10,7 @@
 // Response Codes Enum:
 enum ResponseCode
 {
-	ERROR_RESPONSE = 2,
+	ERROR_RESPONSE = 102,
 	LOGIN_RESPONSE,
 	SIGNUP_RESPONSE,
 	LOGOUT_RESPONSE,

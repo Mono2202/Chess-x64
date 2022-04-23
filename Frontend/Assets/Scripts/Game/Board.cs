@@ -139,7 +139,7 @@ public class Board : MonoBehaviour
         while (true)
         {
             // Waiting:
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(Data.DELAY_TIME);
             
             // Current player has played:
             if (playerMove != "")

@@ -135,8 +135,9 @@ void Communicator::handleNewClient(SOCKET sock)
 			}
 
 			// Creating the RequestInfo struct:
-			rqInfo.buffer = Buffer(buffer.begin(), buffer.end());
-			rqInfo.id = buffer[0];
+			Buffer decryptedBuffer = AES::decrypt(Buffer(buffer.begin(), buffer.end()));
+			rqInfo.buffer = decryptedBuffer;
+			rqInfo.id = decryptedBuffer[0];
 			rqInfo.receivalTime = time(NULL);
 
 			// Condition: relevant request
@@ -172,7 +173,9 @@ void Communicator::handleNewClient(SOCKET sock)
 			}
 
 			// Sending the a message to the client:
-			if (!send(sock, (char*)&rqResult.buffer[0], rqResult.buffer.size(), 0)) {
+			Buffer s1 = AES::encrypt(rqResult.buffer);
+			char* s = (char*)&AES::encrypt(rqResult.buffer)[0];
+			if (!send(sock, (char*)&AES::encrypt(rqResult.buffer)[0], AES::encrypt(rqResult.buffer).size(), 0)) {
 				throw std::exception("Could not send message back to client");
 			}
 		}
@@ -231,4 +234,24 @@ void Communicator::handleNewClient(SOCKET sock)
 	// Deleting the client:
 	m_clients.erase(sock);
 	::closesocket(sock);
+}
+
+/*
+Decrypt packet with AES
+Input : buffer - encrypted packet
+Output:
+*/
+Buffer Communicator::decryptPacket(Buffer buffer) const
+{
+	return Buffer();
+}
+
+/*
+Encrypting packet with AES
+Input : buffer - packet to encrypt
+Output:
+*/
+Buffer Communicator::encryptPacket(Buffer buffer) const
+{
+	return Buffer();
 }
