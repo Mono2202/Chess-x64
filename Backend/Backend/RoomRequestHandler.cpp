@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "RoomRequestHandler.h"
 #include "RequestHandlerFactory.h"
 #include <iostream>
@@ -97,11 +98,25 @@ RequestResult RoomRequestHandler::leaveRoom(RequestInfo request)
         // Adding the stats:
         m_roomManager.getDatabase()->addStatistics(m_user.getUsername(), LOST_GAME);
         m_roomManager.getDatabase()->addStatistics(otherUser, WON_GAME);
+        m_roomManager.getRoom(m_room.getRoomData().id)->setWinner(otherUser);
         std::cout << "Win\n";
     }
 
     // Condition: 0 users in the room
     else if (m_roomManager.getRoom(m_room.getRoomData().id)->getAllUsers().size() == 0) {
+        // Getting the current date:
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        std::ostringstream oss;
+        oss << std::put_time(&tm, "%d/%m/%Y");
+        string date = oss.str();
+
+        // Adding the game:
+        m_handlerFactory.m_database->addGame(m_roomManager.getRoom(m_room.getRoomData().id)->getUsernames()[0],
+            m_roomManager.getRoom(m_room.getRoomData().id)->getUsernames()[1], m_roomManager.getRoom(m_room.getRoomData().id)->getMoves(),
+            m_roomManager.getRoom(m_room.getRoomData().id)->getWinner(), date);
+        
+        // Deleting the room:
         m_roomManager.deleteRoom(m_room.getRoomData().id);
         std::cout << "Delete\n";
     }
@@ -129,6 +144,7 @@ RequestResult RoomRequestHandler::submitMove(RequestInfo request)
 
     // Creating Response:
     m_roomManager.getRoom(m_room.getRoomData().id)->setCurrentMove(deserializedRequest.move);
+    m_roomManager.getRoom(m_room.getRoomData().id)->addMove(deserializedRequest.move);
     SubmitMoveResponse response = { SUCCESS_STATUS };
 
     // Checking if the game has ended by win:
@@ -136,6 +152,7 @@ RequestResult RoomRequestHandler::submitMove(RequestInfo request)
     {
         // Adding the stats:
         m_roomManager.getDatabase()->addStatistics(m_user.getUsername(), WON_GAME);
+        m_roomManager.getRoom(m_room.getRoomData().id)->setWinner(m_user.getUsername());
         string otherUser = (m_room.getAllUsers()[0] != m_user.getUsername()) ? m_room.getAllUsers()[0] : m_room.getAllUsers()[1];
         m_roomManager.getDatabase()->addStatistics(otherUser, LOST_GAME);
         m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false);
@@ -146,6 +163,7 @@ RequestResult RoomRequestHandler::submitMove(RequestInfo request)
     {
         // Adding the stats:
         m_roomManager.getDatabase()->addStatistics(m_user.getUsername(), TIED_GAME);
+        m_roomManager.getRoom(m_room.getRoomData().id)->setWinner("!TIE!");
         string otherUser = (m_room.getAllUsers()[0] != m_user.getUsername()) ? m_room.getAllUsers()[0] : m_room.getAllUsers()[1];
         m_roomManager.getDatabase()->addStatistics(otherUser, TIED_GAME);
         m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false);

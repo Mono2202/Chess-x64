@@ -32,4 +32,16 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Settings.unity
     guid: 1233b7b5386d4e44f97460601908ec60
+  - enabled: 1
+    path: Assets/Scenes/CreateRoom.unity
+    guid: 15ec4db8f091ba54caefa4317255356e
+  - enabled: 1
+    path: Assets/Scenes/PrivateSearching.unity
+    guid: 1eaa06c63c7d33048aa32dfb3cd2dc01
+  - enabled: 1
+    path: Assets/Scenes/MatchHistory.unity
+    guid: 9acdbea213a14004c88291286bc51f87
+  - enabled: 1
+    path: Assets/Scenes/SearchPlayer.unity
+    guid: 9fb946d9c012cc844bec22c5e01f0126
   m_configObjects: {}

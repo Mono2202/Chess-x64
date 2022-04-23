@@ -43,4 +43,6 @@ private:
 	RequestResult joinRoom(RequestInfo request);
 	RequestResult createRoom(RequestInfo request);
 	RequestResult searchEloRoom(RequestInfo request);
+	RequestResult searchPrivateRoom(RequestInfo request);
+	RequestResult getMatchHistory(RequestInfo request);
 };

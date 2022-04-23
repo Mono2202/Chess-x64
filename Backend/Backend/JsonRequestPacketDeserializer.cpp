@@ -77,6 +77,42 @@ SubmitMoveRequest JsonRequestPacketDeserializer::deserializeSubmitMoveRequest(Bu
     return request;
 }
 
+SearchPrivateRoomRequest JsonRequestPacketDeserializer::deserializeSearchPrivateRoomRequest(Buffer& buffer)
+{
+    // Inits:
+    SearchPrivateRoomRequest request;
+    json data = getJsonData(buffer);
+
+    // Building the request:
+    request.roomCode = data["RoomCode"];
+
+    return request;
+}
+
+GetMatchHistoryRequest JsonRequestPacketDeserializer::deserializeGetMatchHistoryRequest(Buffer& buffer)
+{
+    // Inits:
+    GetMatchHistoryRequest request;
+    json data = getJsonData(buffer);
+
+    // Building the request:
+    request.username = data["Username"];
+
+    return request;
+}
+
+GetPersonalStatsRequest JsonRequestPacketDeserializer::deserializeGetPersonalStatsRequest(Buffer& buffer)
+{
+    // Inits:
+    GetPersonalStatsRequest request;
+    json data = getJsonData(buffer);
+
+    // Building the request:
+    request.username = data["Username"];
+
+    return request;
+}
+
 
 // Private Static Methods:
 

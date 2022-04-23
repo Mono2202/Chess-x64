@@ -27,18 +27,12 @@ public:
 	virtual void close() = 0;
 
 
-	/* Users Table */
-
-	// Queries:
+	// Users Table:
 	virtual bool doesUserExist(const string& username) = 0;
 	virtual bool doesPasswordMatch(const string& username, const string& password) = 0;
-
-	// Actions:
 	virtual void addNewUser(const string& username, const string& password, const string& email) = 0;
 
-	/* Statistics Table */
-
-	// Queries:
+	// Statistics Table:
 	virtual int getNumOfPlayerWins(const string& username) = 0;
 	virtual int getNumOfPlayerLosses(const string& username) = 0;
 	virtual int getNumOfPlayerTies(const string& username) = 0;
@@ -46,4 +40,9 @@ public:
 	virtual int getPlayerElo(const string& username) = 0;
 	virtual vector<string> getHighScores() = 0;
 	virtual void addStatistics(const string& username, int gameStatus) = 0;
+
+	// Games Table:
+	virtual void addGame(const string& whiteUsername, const string& blackUsername, const string& game,
+		const string& wonUsername, const string& date) = 0;
+	virtual vector<string> getGames(const string& username) = 0;
 };

@@ -14,12 +14,12 @@ public class Stats : MonoBehaviour
     void Start()
     {
         // Inits:
-        statsLables[0].text += Data.instance.username;
+        statsLables[0].text += Data.instance.profileUsername;
         communicator = Data.instance.communicator;
         string[] stats;
 
         // Sending the stats request:
-        communicator.Write(Serializer.SerializeRequest<GetPersonalStatsRequest>(new GetPersonalStatsRequest { }, Serializer.GET_PERSONAL_STATS_REQUEST));
+        communicator.Write(Serializer.SerializeRequest<GetPersonalStatsRequest>(new GetPersonalStatsRequest { Username = Data.instance.profileUsername }, Serializer.GET_PERSONAL_STATS_REQUEST));
 
         // Deserializing the response:
         GetPersonalStatsResponse response = Deserializer.DeserializeResponse<GetPersonalStatsResponse>(communicator.Read());

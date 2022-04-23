@@ -4,6 +4,10 @@
 #include "IRequestHandler.h"
 #include "RoomManager.h"
 #include <string>
+#include <iostream>
+#include <iomanip>
+#include <ctime>
+#include <sstream>
 
 // Class Declaration:
 class RequestHandlerFactory;

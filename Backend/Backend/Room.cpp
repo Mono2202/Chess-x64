@@ -2,6 +2,13 @@
 
 // C'tors:
 
+Room::Room()
+{
+	moves = "";
+	whiteUsername = "";
+	blackUsername = "";
+}
+
 Room::Room(const RoomData& data) : m_metadata(data) {	}
 
 
@@ -34,7 +41,9 @@ void Room::setCurrentMove(string move)
 		std::random_shuffle(users.begin(), users.end());
 
 		// Choosing the starting color for each player
-		this->m_metadata.currentMove = users[0] + "&&&W&&&" + users[1] + "&&&B";	
+		this->m_metadata.currentMove = users[0] + "&&&W&&&" + users[1] + "&&&B";
+		whiteUsername = users[0];
+		blackUsername = users[1];
 	}
 
 	else {
@@ -50,6 +59,43 @@ Output: < None >
 string Room::getCurrentMove() const
 {
 	return this->m_metadata.currentMove;
+}
+
+/*
+Adding the current move
+Input : move - the move
+Output: < None >
+*/
+void Room::addMove(const string& move)
+{
+	moves += move + " ";
+}
+
+string Room::getMoves() const
+{
+	return moves;
+}
+
+vector<string> Room::getUsernames() const
+{
+	// Inits:
+	vector<string> usernames;
+
+	// Adding the usernames:
+	usernames.push_back(whiteUsername);
+	usernames.push_back(blackUsername);
+
+	return usernames;
+}
+
+void Room::setWinner(const string& username)
+{
+	wonUsername = username;
+}
+
+string Room::getWinner() const
+{
+	return wonUsername;
 }
 
 /*

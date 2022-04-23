@@ -26,6 +26,7 @@ public class Board : MonoBehaviour
     [HideInInspector] public bool isPlayerWhite;
     [HideInInspector] public bool isCurrentPlayerWhite;
     [HideInInspector] public string playerMove;
+    [HideInInspector] public bool gameOver = false;
 
     // Constants:
     public const int BOARD_SIZE = 8;
@@ -300,6 +301,9 @@ public class Board : MonoBehaviour
 
     private void GameOver(string status, Color32 titleColor, Color32 textColor)
     {
+        // Setting the flag:
+        gameOver = true;
+
         // Opening the popup window:
         popupWindow.GetComponent<PopupWindow>().SetProperties("Results", status, titleColor, textColor);
         popupWindow.SetActive(true);

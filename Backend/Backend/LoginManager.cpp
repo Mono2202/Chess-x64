@@ -56,6 +56,7 @@ void LoginManager::login(const string& username, const string& password)
 		throw std::exception("Password doesn't match\n");
 	}
 
+	// Checking if the user is already logged-in:
 	for (i = 0; i < m_loggedUsers.size(); i++)
 	{
 		if (m_loggedUsers[i].getUsername() == username)

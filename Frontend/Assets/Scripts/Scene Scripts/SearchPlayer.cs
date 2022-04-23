@@ -1,16 +1,16 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Login : MonoBehaviour
+public class SearchPlayer : MonoBehaviour
 {
     // Fields:
     public InputField usernameInput;
-    public InputField passwordInput;
-    public Button signInButton;
-    public Text signInButtonText;
+    public Button searchButton;
+    public Text searchButtonText;
     public GameObject popupWindow;
     private Communicator communicator;
 
+    // Start is called before the first frame update
     void Start()
     {
         // Inits:
@@ -20,14 +20,14 @@ public class Login : MonoBehaviour
     void Update()
     {
         // Checking if fields were filled:
-        signInButton.interactable = !(usernameInput.text == "" || passwordInput.text == "");
-        signInButtonText.color = !(usernameInput.text == "" || passwordInput.text == "") ? new Color32(31, 194, 18, 255) : new Color32(31, 194, 18, 100);
+        searchButton.interactable = !(usernameInput.text == "");
+        searchButtonText.color = !(usernameInput.text == "") ? new Color32(31, 194, 18, 255) : new Color32(31, 194, 18, 100);
     }
 
-    public void SendLoginMessage()
+    public void GetProfile()
     {
-        // Sending the login message:
-        communicator.Write(Serializer.SerializeRequest<LoginRequest>(new LoginRequest { Username = usernameInput.text, Password = passwordInput.text }, Serializer.LOGIN_REQUEST));
+        // Sending the stats request:
+        communicator.Write(Serializer.SerializeRequest<GetPersonalStatsRequest>(new GetPersonalStatsRequest { Username = usernameInput.text }, Serializer.GET_PERSONAL_STATS_REQUEST));
 
         // Getting the response:
         string msg = communicator.Read();
@@ -39,18 +39,13 @@ public class Login : MonoBehaviour
             ErrorResponse err = Deserializer.DeserializeResponse<ErrorResponse>(msg);
             popupWindow.GetComponent<PopupWindow>().SetProperties("ERROR", err.Message, new Color32(240, 41, 41, 255), new Color32(240, 41, 41, 255));
             popupWindow.SetActive(true);
-
-            // Resetting the inputs:
-            usernameInput.text = "";
-            passwordInput.text = "";
             return;
         }
 
         // Updating the username:
-        Data.instance.username = usernameInput.text;
         Data.instance.profileUsername = usernameInput.text;
 
-        // Switching to the menu scene:
-        this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.MENU_SCENE_COUNT);
+        // Switching to the profile scene:
+        this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.STATS_SCENE_COUNT);
     }
 }

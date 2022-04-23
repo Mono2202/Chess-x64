@@ -1,4 +1,5 @@
 #include "RoomManager.h"
+#include <iostream>
 RoomManager* RoomManager::m_roomManagerInstance = nullptr;
 
 // C'tor:
@@ -127,8 +128,31 @@ RoomData RoomManager::getEloRoom() const
 			room.second.getRoomData().currentMove != "OPPONENT LEFT") {
 			return room.second.getRoomData();
 		}
+	}
+	// TODO: ADD ELO CHECK
 
-		// TODO: ADD ELO CHECK
+	// Condition: no game was found
+	return currentRoomData;
+}
+
+/*
+Getting a private room
+Input : roomCode - the room code
+Output: the room's data
+*/
+RoomData RoomManager::getPrivateRoom(const string& roomCode) const
+{
+	// Inits:
+	RoomData currentRoomData = { 0, false, "", "F" };
+
+	// Going through the rooms:
+	for (auto& room : m_rooms) {
+		// Condition: game found by room code
+		if (room.second.getRoomData().gameMode[0] == PRIVATE_GAME_MODE &&
+			!room.second.getRoomData().isActive &&
+			std::to_string(room.second.getRoomData().id) == roomCode) {
+			return room.second.getRoomData();
+		}
 	}
 
 	// Condition: no game was found

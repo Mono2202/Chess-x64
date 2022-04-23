@@ -63,6 +63,7 @@ class JoinRoomResponse
 class CreateRoomResponse
 {
     public int Status { get; set; }
+    public int RoomID { get; set; }
 }
 
 // SearchEloRoomResponse Class:
@@ -92,6 +93,20 @@ class LeaveRoomResponse
 class SubmitMoveResponse
 {
     public int Status { get; set; }
+}
+
+// SearchPrivateRoomResponse Class:
+class SearchPrivateRoomResponse
+{
+    public int Status { get; set; }
+    public int RoomID { get; set; }
+}
+
+// GetMatchHistoryResponse Class:
+class GetMatchHistoryResponse
+{
+    public int Status { get; set; }
+    public string Games { get; set; }
 }
 
 class Deserializer
