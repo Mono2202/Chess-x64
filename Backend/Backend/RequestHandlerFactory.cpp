@@ -32,7 +32,7 @@ Creating a new room member request handler
 Input : < None >
 Output: the room member request handler
 */
-RoomRequestHandler* RequestHandlerFactory::createRoomRequestHandler(LoggedUser& user, Room& room) { return new RoomRequestHandler(room, user, m_roomManager, *this); }
+RoomRequestHandler* RequestHandlerFactory::createRoomRequestHandler(LoggedUser& user, Room& room) { return new RoomRequestHandler(room, user, m_roomManager, m_statisticsManager, *this); }
 
 /*
 Returning the login manager

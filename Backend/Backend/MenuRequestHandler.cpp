@@ -246,8 +246,12 @@ RequestResult MenuRequestHandler::getMatchHistory(RequestInfo request)
 {
     // Inits:
     RequestResult result;
-    GetMatchHistoryRequest searchRequest = JsonRequestPacketDeserializer::deserializeGetMatchHistoryRequest(request.buffer);
-    GetMatchHistoryResponse response = { SUCCESS_STATUS, m_handlerFactory.m_database->getGames(searchRequest.username)};
+    GetMatchHistoryResponse response;
+    GetMatchHistoryRequest statsRequest = JsonRequestPacketDeserializer::deserializeGetMatchHistoryRequest(request.buffer);
+
+    // Creating Response:
+    response.status = SUCCESS_STATUS;
+    response.games = m_statisticsManager.getGames(statsRequest.username);
 
     // Creating Result:
     result.buffer = JsonResponsePacketSerializer::serializeResponse(response);

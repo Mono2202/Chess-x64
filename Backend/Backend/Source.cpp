@@ -14,7 +14,7 @@ int main()
 	{
 		// Server Inits:
 		WSAInitializer wsa_init;
-		SqliteDataBase* database = SqliteDataBase::getInstance();
+		SqliteDatabase* database = SqliteDatabase::getInstance();
 		Server* server = Server::getInstance(database);
 
 		// Running the server:

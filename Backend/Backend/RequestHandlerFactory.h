@@ -31,11 +31,9 @@ public:
     RoomManager& getRoomManager();
     StatisticsManager& getStatisticsManager();
 
-    // Fields:
-    IDatabase* m_database;
-
 private:
     // Fields:
+    IDatabase* m_database;
     LoginManager m_loginManager;
     RoomManager m_roomManager;
     StatisticsManager m_statisticsManager;

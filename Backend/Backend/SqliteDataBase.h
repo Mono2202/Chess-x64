@@ -14,15 +14,15 @@
 #define DB_DOESNT_EXIST -1
 
 
-// SqliteDataBase Class:
-class SqliteDataBase : public IDatabase
+// SqliteDatabase Class:
+class SqliteDatabase : public IDatabase
 {
 public:
 	// Static C'tor:
-	static SqliteDataBase* getInstance();
+	static SqliteDatabase* getInstance();
 
 	// D'tors:
-	virtual ~SqliteDataBase();
+	virtual ~SqliteDatabase();
 
 	// DB Functions:
 	virtual bool open();
@@ -50,10 +50,10 @@ public:
 
 private:
 	// Private C'tor:
-	SqliteDataBase() = default;
+	SqliteDatabase() = default;
 
 	// Fields:
-	static SqliteDataBase* m_sqliteDataBaseInstance;
+	static SqliteDatabase* m_SqliteDatabaseInstance;
 	sqlite3* m_db;
 
 	// Callback Functions:

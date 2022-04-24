@@ -19,7 +19,7 @@ class RoomRequestHandler : public IRequestHandler
 {
 public:
 	// C'tor & D'tor:
-	RoomRequestHandler(Room& room, LoggedUser& user, RoomManager& roomManager, RequestHandlerFactory& handlerFactory);
+	RoomRequestHandler(Room& room, LoggedUser& user, RoomManager& roomManager, StatisticsManager& statisticsManager, RequestHandlerFactory& handlerFactory);
 	~RoomRequestHandler() = default;
 
 	// Pure Virtual Methods:
@@ -31,6 +31,7 @@ private:
 	Room m_room;
 	LoggedUser m_user;
 	RoomManager& m_roomManager;
+	StatisticsManager& m_statisticsManager;
 	RequestHandlerFactory& m_handlerFactory;
 
 	// Protected Methods:

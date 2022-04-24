@@ -5,8 +5,8 @@
 
 // C'tor:
 
-RoomRequestHandler::RoomRequestHandler(Room& room, LoggedUser& user, RoomManager& roomManager, RequestHandlerFactory& handlerFactory) : m_room(room), m_user(user),
-m_roomManager(roomManager), m_handlerFactory(handlerFactory)
+RoomRequestHandler::RoomRequestHandler(Room& room, LoggedUser& user, RoomManager& roomManager, StatisticsManager& statisticsManager, RequestHandlerFactory& handlerFactory) : m_room(room), m_user(user),
+m_roomManager(roomManager), m_statisticsManager(statisticsManager), m_handlerFactory(handlerFactory)
 {}
 
 /*
@@ -96,8 +96,8 @@ RequestResult RoomRequestHandler::leaveRoom(RequestInfo request)
         string otherUser = (m_room.getAllUsers()[0] != m_user.getUsername()) ? m_room.getAllUsers()[0] : m_room.getAllUsers()[1];
 
         // Adding the stats:
-        m_roomManager.getDatabase()->addStatistics(m_user.getUsername(), LOST_GAME);
-        m_roomManager.getDatabase()->addStatistics(otherUser, WON_GAME);
+        m_statisticsManager.addUserStatistics(m_user.getUsername(), LOST_GAME);
+        m_statisticsManager.addUserStatistics(otherUser, WON_GAME);
         m_roomManager.getRoom(m_room.getRoomData().id)->setWinner(otherUser);
         std::cout << "Opponent Left\n";
 
@@ -126,7 +126,7 @@ RequestResult RoomRequestHandler::leaveRoom(RequestInfo request)
         string date = oss.str();
 
         // Adding the game:
-        m_handlerFactory.m_database->addGame(m_roomManager.getRoom(m_room.getRoomData().id)->getUsernames()[0],
+        m_statisticsManager.addGame(m_roomManager.getRoom(m_room.getRoomData().id)->getUsernames()[0],
             m_roomManager.getRoom(m_room.getRoomData().id)->getUsernames()[1], m_roomManager.getRoom(m_room.getRoomData().id)->getMoves(),
             m_roomManager.getRoom(m_room.getRoomData().id)->getWinner(), date);
         
@@ -166,20 +166,20 @@ RequestResult RoomRequestHandler::submitMove(RequestInfo request)
     if (deserializedRequest.move.find('#') != std::string::npos)
     {
         // Adding the stats:
-        m_roomManager.getDatabase()->addStatistics(m_user.getUsername(), WON_GAME);
+        m_statisticsManager.addUserStatistics(m_user.getUsername(), WON_GAME);
         m_roomManager.getRoom(m_room.getRoomData().id)->setWinner(m_user.getUsername());
-        m_roomManager.getDatabase()->addStatistics(otherUser, LOST_GAME);
-        m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false);
+        m_statisticsManager.addUserStatistics(otherUser, LOST_GAME);
+        m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false); // TODO: REMOVE TO GET REMATCH AFTER 10 SEC, DISABLE ROOM ACTIVITY ONLY WHEN LEAVING
     }
 
     // Checking if the game has ended by tie:
     else if (deserializedRequest.move.find('%') != std::string::npos)
     {
         // Adding the stats:
-        m_roomManager.getDatabase()->addStatistics(m_user.getUsername(), TIED_GAME);
+        m_statisticsManager.addUserStatistics(m_user.getUsername(), TIED_GAME);
         m_roomManager.getRoom(m_room.getRoomData().id)->setWinner("!TIE!");
-        m_roomManager.getDatabase()->addStatistics(otherUser, TIED_GAME);
-        m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false);
+        m_statisticsManager.addUserStatistics(otherUser, TIED_GAME);
+        m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false); // TODO: REMOVE TO GET REMATCH AFTER 10 SEC, DISABLE ROOM ACTIVITY ONLY WHEN LEAVING
     }
 
     // Updating the other player:

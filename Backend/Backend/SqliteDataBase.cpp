@@ -1,23 +1,23 @@
-#include "SqliteDataBase.h"
-SqliteDataBase* SqliteDataBase::m_sqliteDataBaseInstance = nullptr;
+#include "SqliteDatabase.h"
+SqliteDatabase* SqliteDatabase::m_SqliteDatabaseInstance = nullptr;
 
 // C'tor:
 
-SqliteDataBase* SqliteDataBase::getInstance()
+SqliteDatabase* SqliteDatabase::getInstance()
 {
-	if (m_sqliteDataBaseInstance == nullptr) {
-		m_sqliteDataBaseInstance = new SqliteDataBase();
+	if (m_SqliteDatabaseInstance == nullptr) {
+		m_SqliteDatabaseInstance = new SqliteDatabase();
 	}
 
-	return m_sqliteDataBaseInstance;
+	return m_SqliteDatabaseInstance;
 }
 
 
 // D'tor:
 
-SqliteDataBase::~SqliteDataBase()
+SqliteDatabase::~SqliteDatabase()
 {
-	delete m_sqliteDataBaseInstance;
+	delete m_SqliteDatabaseInstance;
 }
 
 
@@ -29,7 +29,7 @@ Input : < None >
 Output: true  - opening the DB was successfull
 		false - otherwise
 */
-bool SqliteDataBase::open()
+bool SqliteDatabase::open()
 {
 	// Inits:
 	string query = "CREATE TABLE USERS(username TEXT NOT NULL PRIMARY KEY, password TEXT NOT NULL, email TEXT NOT NULL);\n\
@@ -66,7 +66,7 @@ Closing the DB
 Input : < None >
 Output: < None >
 */
-void SqliteDataBase::close()
+void SqliteDatabase::close()
 {
 	// Closing the DB:
 	if (m_db != nullptr)
@@ -84,7 +84,7 @@ Checking whether a user exists
 Input : username - the username
 Output: found	 - whether the user exists
 */
-bool SqliteDataBase::doesUserExist(const string& username)
+bool SqliteDatabase::doesUserExist(const string& username)
 {
 	// Inits:
 	string query = "SELECT * FROM USERS WHERE username='" + username + "';";
@@ -106,7 +106,7 @@ Input : username - the username
 		password - the password
 Output: found	 - whether the password matches to the username
 */
-bool SqliteDataBase::doesPasswordMatch(const string& username, const string& password)
+bool SqliteDatabase::doesPasswordMatch(const string& username, const string& password)
 {
 	// Inits:
 	string query = "SELECT password FROM USERS WHERE username='" + username + "';";
@@ -134,7 +134,7 @@ Input : username - the username
 		email	 - the email
 Output: < None >
 */
-void SqliteDataBase::addNewUser(const string& username, const string& password, const string& email)
+void SqliteDatabase::addNewUser(const string& username, const string& password, const string& email)
 {
 	// Inits:
 	string usersQuery = "INSERT INTO USERS VALUES ('" + username + "', '" + RSA::encrypt(password) + "', '" + RSA::encrypt(email) + "');";
@@ -160,7 +160,7 @@ Getting a player's number of games won
 Input : username - the player's username
 Output: avgTime  - the player's number of games won
 */
-int SqliteDataBase::getNumOfPlayerWins(const string& username)
+int SqliteDatabase::getNumOfPlayerWins(const string& username)
 {
 	// Inits:
 	string query = "SELECT gamesWon FROM STATISTICS WHERE username='" + username + "';";
@@ -181,7 +181,7 @@ Getting a player's number of games lost
 Input : username - the player's username
 Output: avgTime  - the player's number of games lost
 */
-int SqliteDataBase::getNumOfPlayerLosses(const string& username)
+int SqliteDatabase::getNumOfPlayerLosses(const string& username)
 {
 	// Inits:
 	string query = "SELECT gamesLost FROM STATISTICS WHERE username='" + username + "';";
@@ -202,7 +202,7 @@ Getting a player's number of games tied
 Input : username - the player's username
 Output: avgTime  - the player's number of games tied
 */
-int SqliteDataBase::getNumOfPlayerTies(const string& username)
+int SqliteDatabase::getNumOfPlayerTies(const string& username)
 {
 	// Inits:
 	string query = "SELECT gamesTied FROM STATISTICS WHERE username='" + username + "';";
@@ -223,7 +223,7 @@ Getting a player's number of games
 Input : username - the player's username
 Output: avgTime  - the player's number of games
 */
-int SqliteDataBase::getNumOfPlayerGames(const string& username)
+int SqliteDatabase::getNumOfPlayerGames(const string& username)
 {
 	// Inits:
 	string query = "SELECT totalGames FROM STATISTICS WHERE username='" + username + "';";
@@ -244,7 +244,7 @@ Getting a player's ELO
 Input : username - the player's username
 Output: avgTime  - the player's ELO
 */
-int SqliteDataBase::getPlayerElo(const string& username)
+int SqliteDatabase::getPlayerElo(const string& username)
 {
 	// Inits:
 	string query = "SELECT elo FROM STATISTICS WHERE username='" + username + "';";
@@ -265,7 +265,7 @@ Getting the highscores
 Input : < None >
 Output: topScores - the highscores
 */
-vector<string> SqliteDataBase::getHighScores()
+vector<string> SqliteDatabase::getHighScores()
 {
 	// Inits:
 	string query = "SELECT username, gamesWon FROM STATISTICS ORDER BY gamesWon DESC LIMIT 5;";
@@ -287,7 +287,7 @@ Input : username   - the username
 		gameStatus - whether won / lost / tied
 Output: < None >
 */
-void SqliteDataBase::addStatistics(const string& username, int gameStatus)
+void SqliteDatabase::addStatistics(const string& username, int gameStatus)
 {
 	// Inits:
 	string query = "SELECT username FROM STATISTICS WHERE username='" + username + "';";
@@ -326,13 +326,15 @@ void SqliteDataBase::addStatistics(const string& username, int gameStatus)
 }
 
 /*
-Adding a game
+Adding a game to the DB
 Input : whiteUsername - the white username
 		blackUsername - the black username
 		game		  - the game string
+		wonUsername   - the username of the winning player
+		date		  - the date the game took place
 Output: < None >
 */
-void SqliteDataBase::addGame(const string& whiteUsername, const string& blackUsername, const string& game,
+void SqliteDatabase::addGame(const string& whiteUsername, const string& blackUsername, const string& game,
 	const string& wonUsername, const string& date)
 {
 	// Inits
@@ -351,7 +353,7 @@ Getting user's games
 Input : username - the username
 Output: 
 */
-vector<string> SqliteDataBase::getGames(const string& username)
+vector<string> SqliteDatabase::getGames(const string& username)
 {
 	// Inits:
 	string query = "SELECT * FROM GAMES WHERE whiteUsername='" + username + "' OR blackUsername='" + username + "';";
@@ -373,7 +375,7 @@ vector<string> SqliteDataBase::getGames(const string& username)
 /*
 Callback for checking whether an item exists in the DB
 */
-int SqliteDataBase::outputExistsCallback(void* data, int argc, char** argv, char** azColName)
+int SqliteDatabase::outputExistsCallback(void* data, int argc, char** argv, char** azColName)
 {
 	// Inits:
 	bool* output = static_cast<bool*>(data);
@@ -386,7 +388,7 @@ int SqliteDataBase::outputExistsCallback(void* data, int argc, char** argv, char
 /*
 Callback to get integer value from STATISTICS table
 */
-int SqliteDataBase::intNumCallback(void* data, int argc, char** argv, char** azColName)
+int SqliteDatabase::intNumCallback(void* data, int argc, char** argv, char** azColName)
 {
 	// Inits:
 	int* num = static_cast<int*>(data);
@@ -401,7 +403,7 @@ int SqliteDataBase::intNumCallback(void* data, int argc, char** argv, char** azC
 /*
 Callback to add score to scores vector from STATISTICS table
 */
-int SqliteDataBase::scoreCallback(void* data, int argc, char** argv, char** azColName)
+int SqliteDatabase::scoreCallback(void* data, int argc, char** argv, char** azColName)
 {
 	// Inits:
 	vector<string>* score = static_cast<vector<string>*>(data);
@@ -417,7 +419,7 @@ int SqliteDataBase::scoreCallback(void* data, int argc, char** argv, char** azCo
 /*
 Callback to get password from USERS table
 */
-int SqliteDataBase::getPasswordCallback(void* data, int argc, char** argv, char** azColName)
+int SqliteDatabase::getPasswordCallback(void* data, int argc, char** argv, char** azColName)
 {
 	// Inits:
 	string* password = static_cast<string*>(data);
@@ -429,7 +431,7 @@ int SqliteDataBase::getPasswordCallback(void* data, int argc, char** argv, char*
 	return 0;
 }
 
-int SqliteDataBase::gamesCallback(void* data, int argc, char** argv, char** azColName)
+int SqliteDatabase::gamesCallback(void* data, int argc, char** argv, char** azColName)
 {
 	// Inits:
 	vector<string>* games = static_cast<vector<string>*>(data);

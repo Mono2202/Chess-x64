@@ -2,7 +2,7 @@
 
 // Includes:
 #include "Communicator.h"
-#include "SqliteDataBase.h"
+#include "SqliteDatabase.h"
 #include <string>
 
 // Server Class:

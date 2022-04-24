@@ -15,6 +15,10 @@ public:
 
 	// Methods:
 	vector<string> getUserStatistics(const string& username);
+	void addUserStatistics(const string& username, int gameStatus);
+	vector<string> getGames(const string& username);
+	void addGame(const string& whiteUsername, const string& blackUsername, const string& game,
+		const string& wonUsername, const string& date);
 	vector<string> getHighScore();
 
 private:

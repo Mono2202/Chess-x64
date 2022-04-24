@@ -50,6 +50,47 @@ vector<string> StatisticsManager::getUserStatistics(const string& username)
 }
 
 /*
+Adding stats
+Input : username   - the username
+		gameStatus - whether won / lost / tied
+Output: < None >
+*/
+void StatisticsManager::addUserStatistics(const string& username, int gameStatus)
+{
+	m_database->addStatistics(username, gameStatus);
+}
+
+/*
+Getting the user games
+Input : username - the user's username
+Output: games	 - the user's games
+*/
+vector<string> StatisticsManager::getGames(const string& username)
+{
+	// Condition: user doesn't exist
+	if (!m_database->doesUserExist(username)) {
+		throw std::exception("User doesn't exist\n");
+	}
+
+	return m_database->getGames(username);
+}
+
+/*
+Adding a game to the DB
+Input : whiteUsername - the white username
+		blackUsername - the black username
+		game		  - the game string
+		wonUsername   - the username of the winning player
+		date		  - the date the game took place
+Output: < None >
+*/
+void StatisticsManager::addGame(const string& whiteUsername, const string& blackUsername, const string& game, const string& wonUsername, const string& date)
+{
+	// Adding the game to the DB:
+	m_database->addGame(whiteUsername, blackUsername, game, wonUsername, date);
+}
+
+/*
 Getting the highscores
 Input : < None >
 Output: the highscores
