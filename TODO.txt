@@ -80,3 +80,5 @@
 - DISPLAY MOVES MID GAME WITH Algebraic notation
 - DISPLAY MULTIPLE LINES WHEN IN BOARD EDITOR - WITH POP UP WINDOW
 - REMATCH - STAY IN ROOM FOR 10 SECONDS AFTER GAME IS FINISHED
+- IMPORTANT: add to elo match so search by elo to be gamemode="E1000" for players between
+  1000-1099 for example (LOOK TODO IN RoomManager.h)

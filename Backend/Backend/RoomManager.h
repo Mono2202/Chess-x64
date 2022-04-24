@@ -24,9 +24,8 @@ public:
 	unsigned int getRoomState(int ID) const;
 	vector<RoomData> getRooms() const;
 	Room* getRoom(int ID);
-	RoomData getEloRoom() const;
+	RoomData getEloRoom() const; // TODO: GET PLAYER'S ELO TO GET A CORRECT ROOM
 	RoomData getPrivateRoom(const string& roomCode) const;
-	IDatabase* getDatabase() const;
 
 private:
 	// Private C'tor:
