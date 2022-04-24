@@ -68,3 +68,5 @@
   FOR GAME NOT TO LAG
 - IMPORTANT: TURN ALL SERVER COMMS TO THREADS IN UNITY
 - look at chess.com ui
+- IMPORTANT: allow only english characters
+- light theme?

@@ -173,8 +173,6 @@ void Communicator::handleNewClient(SOCKET sock)
 			}
 
 			// Sending the a message to the client:
-			Buffer s1 = AES::encrypt(rqResult.buffer);
-			char* s = (char*)&AES::encrypt(rqResult.buffer)[0];
 			if (!send(sock, (char*)&AES::encrypt(rqResult.buffer)[0], AES::encrypt(rqResult.buffer).size(), 0)) {
 				throw std::exception("Could not send message back to client");
 			}
