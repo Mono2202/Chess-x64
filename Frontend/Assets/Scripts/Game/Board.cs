@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -139,14 +140,14 @@ public class Board : MonoBehaviour
         while (true)
         {
             // Waiting:
-            yield return new WaitForSeconds(Data.DELAY_TIME);
+            yield return new WaitForSeconds(0.1f);
             
             // Current player has played:
             if (playerMove != "")
             {
                 // Sending the submit move request:
                 communicator.Write(Serializer.SerializeRequest<SubmitMoveRequest>(new SubmitMoveRequest { Move = playerMove }, Serializer.SUBMIT_MOVE_REQUEST));
-                
+
                 // Reading the response:
                 string msg = communicator.Read();
 
