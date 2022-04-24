@@ -71,3 +71,11 @@
 - IMPORTANT: allow only english characters
 - light theme?
 - add mutex to Communicator::m_initiateCommunicationSockets
+- ADD TAKEN PIECES TO GUI
+- ADD MOVE HISTORY TO GAME
+- ADD ANALYZE PAST GAMES
+- TURN ALL NUMBERS TO CONSTANTS / DEFINES
+- option to draw arrows
+- grab piece instead of pressing 2 squares
+- DISPLAY MOVES MID GAME WITH Algebraic notation
+- DISPLAY MULTIPLE LINES WHEN IN BOARD EDITOR - WITH POP UP WINDOW
