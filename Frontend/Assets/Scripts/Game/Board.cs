@@ -14,7 +14,7 @@ public class Board : MonoBehaviour
     public GameObject cell;
     public Transform canvas;
     public List<Sprite> chessSprites = new List<Sprite>();
-    public GameObject returnButton;
+    public Button returnButton;
     public GameObject returnButtonSignResign;
     public GameObject returnButtonSignLeave;
     public Text returnButtonText;
@@ -28,6 +28,11 @@ public class Board : MonoBehaviour
     [HideInInspector] public bool isCurrentPlayerWhite;
     [HideInInspector] public string playerMove;
     [HideInInspector] public bool gameOver = false;
+    [HideInInspector] public bool updateBoardFlag = false;
+    [HideInInspector] public string status = "";
+    [HideInInspector] public Color32 titleColor;
+    [HideInInspector] public Color32 textColor;
+
 
     // Constants:
     public const int BOARD_SIZE = 8;
@@ -105,14 +110,33 @@ public class Board : MonoBehaviour
         }
 
         // Starting communication with server about game state:
-        StartCoroutine(GetGameState());
+        Thread tSubmitMove = new Thread(new ThreadStart(SubmitMove));
+        Thread tGetState = new Thread(new ThreadStart(GetState));
+        tSubmitMove.Start();
+        tGetState.Start();
     }
 
     // Update is called once per frame
     void Update()
     {
+        // Condition: can resign
+        if (isCurrentPlayerWhite == isPlayerWhite)
+        {
+            // Enabling the return button:
+            returnButton.interactable = true;
+            returnButtonText.color = new Color32(31, 194, 18, 255);
+        }
+
+        // Condition: can't resign
+        else
+        {
+            // Disabling the return button:
+            returnButton.interactable = false;
+            returnButtonText.color = new Color32(31, 194, 18, 100);
+        }
+
         // Condition: move was played
-        if (selectedPiece != null && selectedDest != null && playerMove == "")
+        if (selectedPiece != null && selectedDest != null && playerMove == "" && !gameOver)
         {
             if (boardArr[selectedPiece.row, selectedPiece.col].GetLegalMoves(boardArr, currentMove).Any(move => (move.Value != null && move.Value.row == selectedDest.row && move.Value.col == selectedDest.col)))
             {
@@ -122,9 +146,6 @@ public class Board : MonoBehaviour
                 // Updating the current move:
                 currentMove = playerMove;
 
-                // Switching players:
-                isCurrentPlayerWhite = !isCurrentPlayerWhite;
-
                 // Updating the board:
                 UpdateBoard(selectedPiece, selectedDest);
             }
@@ -133,17 +154,32 @@ public class Board : MonoBehaviour
             selectedPiece = null;
             selectedDest = null;
         }
+
+        // Condition: board needs to be updated
+        if (updateBoardFlag)
+        {
+            // Resetting the flag:
+            updateBoardFlag = false;
+
+            // Updating the board:
+            UpdateBoard(new Position(currentMove[2] - '1', currentMove[1] - 'a'),
+                new Position(currentMove[4] - '1', currentMove[3] - 'a'));
+        }
+
+        // Condition: game is over
+        if (gameOver)
+        {
+            gameOver = false;
+            GameOver();
+        }
     }
 
-    private IEnumerator GetGameState()
+    private void SubmitMove()
     {
         while (true)
         {
-            // Waiting:
-            yield return new WaitForSeconds(0.1f);
-            
-            // Current player has played:
-            if (playerMove != "")
+            // Condition: current player playes
+            if (isCurrentPlayerWhite == isPlayerWhite && playerMove != "")
             {
                 // Sending the submit move request:
                 communicator.Write(Serializer.SerializeRequest<SubmitMoveRequest>(new SubmitMoveRequest { Move = playerMove }, Serializer.SUBMIT_MOVE_REQUEST));
@@ -154,64 +190,77 @@ public class Board : MonoBehaviour
                 // Condition: game ended with win
                 if (playerMove.Contains("#"))
                 {
-                    GameOver("Win", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
-                    yield break;
+                    gameOver = true;
+                    status = "Win";
+                    titleColor = new Color32(8, 171, 0, 255);
+                    textColor = new Color32(8, 171, 0, 255);
+                    return;
                 }
 
                 // Condition: game ended with tie
                 else if (playerMove.Contains("%"))
                 {
-                    GameOver("Tie", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
-                    yield break;
+                    gameOver = true;
+                    status = "Tie";
+                    titleColor = new Color32(8, 171, 0, 255);
+                    textColor = new Color32(8, 171, 0, 255);
+                    return;
                 }
 
                 // Resetting the player's move:
                 playerMove = "";
-            }
 
-            else
+                // Switching players:
+                isCurrentPlayerWhite = !isCurrentPlayerWhite;
+            }
+        }
+    }
+
+    private void GetState()
+    {
+        while (true)
+        {
+            // Deserializing the response:
+            GetRoomStateResponse response = Deserializer.DeserializeResponse<GetRoomStateResponse>(communicator.Read());
+
+            // Switching players:
+            isCurrentPlayerWhite = !isCurrentPlayerWhite;
+
+            // Updating the current move:
+            currentMove = response.CurrentMove;
+
+            // Condition: game ended with lose
+            if (currentMove.Contains("#"))
             {
-                // Sending the get room state request:
-                communicator.Write(Serializer.SerializeRequest<GetRoomStateRequest>(new GetRoomStateRequest { }, Serializer.GET_ROOM_STATE_REQUEST));
-
-                // Deserializing the response:
-                GetRoomStateResponse response = Deserializer.DeserializeResponse<GetRoomStateResponse>(communicator.Read());
-
-                // Condition: a move has been played
-                if (response.CurrentMove != currentMove)
-                {
-                    // Switching players:
-                    isCurrentPlayerWhite = !isCurrentPlayerWhite;
-
-                    // Updating the current move:
-                    currentMove = response.CurrentMove;
-
-                    // Condition: game ended with lose
-                    if (currentMove.Contains("#"))
-                    {
-                        GameOver("Lose", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
-                        yield break;
-                    }
-
-                    // Condition: game ended with tie
-                    else if (currentMove.Contains("%"))
-                    {
-                        GameOver("Tie", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
-                        yield break;
-                    }
-
-                    // Condition: game ended with win
-                    else if (currentMove.Contains("OPPONENT LEFT"))
-                    {
-                        GameOver("Win", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
-                        yield break;
-                    }
-
-                    // Updating the board:
-                    UpdateBoard(new Position(currentMove[2] - '1', currentMove[1] - 'a'),
-                        new Position(currentMove[4] - '1', currentMove[3] - 'a'));
-                }
+                gameOver = true;
+                status = "Lose";
+                titleColor = new Color32(240, 41, 41, 255);
+                textColor = new Color32(240, 41, 41, 255);
+                return;
             }
+
+            // Condition: game ended with tie
+            else if (currentMove.Contains("%"))
+            {
+                gameOver = true;
+                status = "Tie";
+                titleColor = new Color32(8, 171, 0, 255);
+                textColor = new Color32(8, 171, 0, 255);
+                return;
+            }
+
+            // Condition: game ended with win
+            else if (currentMove.Contains("OPPONENT LEFT"))
+            {
+                gameOver = true;
+                status = "Win";
+                titleColor = new Color32(8, 171, 0, 255);
+                textColor = new Color32(8, 171, 0, 255);
+                return;
+            }
+
+            // Setting the update board flag:
+            updateBoardFlag = true;
         }
     }
 
@@ -300,7 +349,7 @@ public class Board : MonoBehaviour
         this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.MENU_SCENE_COUNT);
     }
 
-    private void GameOver(string status, Color32 titleColor, Color32 textColor)
+    private void GameOver()
     {
         // Setting the flag:
         gameOver = true;
@@ -308,6 +357,10 @@ public class Board : MonoBehaviour
         // Opening the popup window:
         popupWindow.GetComponent<PopupWindow>().SetProperties("Results", status, titleColor, textColor);
         popupWindow.SetActive(true);
+
+        // Enabling the return button:
+        returnButton.interactable = true;
+        returnButtonText.color = new Color32(31, 194, 18, 255);
 
         // Assigning the exit button labels:
         returnButtonSignResign.SetActive(false);

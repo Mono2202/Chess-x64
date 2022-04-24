@@ -13,6 +13,7 @@
 
 // Defines:
 #define PORT 54321
+#define PORT_UPDATER 12345
 #define SIZE 4096
 
 // Using:
@@ -33,6 +34,9 @@ public:
 	// Methods:
 	void startHandleRequests();
 
+	// Public Field:
+	static map<string, SOCKET> m_initiateCommunicationSockets;
+
 private:
 	// Private C'tor:
 	Communicator(RequestHandlerFactory& handlerFactory);
@@ -40,12 +44,11 @@ private:
 	// Fields:
 	static Communicator* m_communicatorInstance;
 	SOCKET m_serverSocket;
+	SOCKET m_serverSocketUpdater;
 	map<SOCKET, IRequestHandler*> m_clients;
 	RequestHandlerFactory& m_handlerFactory;
 
 	// Private Methods:
 	void bindAndListen();
 	void handleNewClient(SOCKET sock);
-	Buffer decryptPacket(Buffer buffer) const;
-	Buffer encryptPacket(Buffer buffer) const;
 };

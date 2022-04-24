@@ -1,5 +1,6 @@
 #include "Communicator.h"
 Communicator* Communicator::m_communicatorInstance = nullptr;
+map<string, SOCKET> Communicator::m_initiateCommunicationSockets;
 
 // C'tors:
 
@@ -90,6 +91,7 @@ void Communicator::bindAndListen()
 {
 	// Inits:
 	struct sockaddr_in sa = { 0 };
+	struct sockaddr_in saUpdater = { 0 };
 
 	// Socket address inits:
 	sa.sin_port = htons(PORT);
@@ -102,6 +104,20 @@ void Communicator::bindAndListen()
 
 	// Listening to the socket:
 	if (::listen(m_serverSocket, SOMAXCONN) == SOCKET_ERROR) {
+		throw std::exception("Failed in initiating server socket listening\n");
+	}
+
+	// Socket address inits:
+	saUpdater.sin_port = htons(PORT_UPDATER);
+	saUpdater.sin_family = AF_INET;
+
+	// Binding the socket:
+	if (::bind(m_serverSocketUpdater, (struct sockaddr*)&saUpdater, sizeof(saUpdater)) == SOCKET_ERROR) {
+		throw std::exception("Failed in server socket binding\n");
+	}
+
+	// Listening to the socket:
+	if (::listen(m_serverSocketUpdater, SOMAXCONN) == SOCKET_ERROR) {
 		throw std::exception("Failed in initiating server socket listening\n");
 	}
 }
@@ -146,6 +162,24 @@ void Communicator::handleNewClient(SOCKET sock)
 				try {
 					std::cout << "ID: " << rqInfo.id << std::endl;
 					rqResult = m_clients.at(sock)->handleRequest(rqInfo);
+
+					// Inserting the client with the name:
+					if (rqInfo.id == LOGIN_REQUEST) {
+						Communicator::m_initiateCommunicationSockets.emplace(std::pair<string, SOCKET>(JsonRequestPacketDeserializer::deserializeLoginRequest(rqInfo.buffer).username, sock));
+					}
+					
+					// Removing the client with the name:
+					if (rqInfo.id == LOGOUT_REQUEST) {
+						for (auto it = Communicator::m_initiateCommunicationSockets.cbegin(); it != Communicator::m_initiateCommunicationSockets.cend();) {
+							if (it->second == sock) {
+								Communicator::m_initiateCommunicationSockets.erase(it++);
+							}
+
+							else {
+								++it;
+							}
+						}
+					}
 				}
 
 				// Catching Request Error:
@@ -222,6 +256,19 @@ void Communicator::handleNewClient(SOCKET sock)
 			m_clients.find(sock)->second->handleRequest(rqInfo);
 			delete m_clients.find(sock)->second;
 			m_clients.find(sock)->second = nullptr;
+
+			// Removing the client with the name:
+			if (rqInfo.id == LOGOUT_REQUEST) {
+				for (auto it = Communicator::m_initiateCommunicationSockets.cbegin(); it != Communicator::m_initiateCommunicationSockets.cend();) {
+					if (it->second == sock) {
+						Communicator::m_initiateCommunicationSockets.erase(it++);
+					}
+
+					else {
+						++it;
+					}
+				}
+			}
 		}
 
 		// Condition: no handler
@@ -232,24 +279,4 @@ void Communicator::handleNewClient(SOCKET sock)
 	// Deleting the client:
 	m_clients.erase(sock);
 	::closesocket(sock);
-}
-
-/*
-Decrypt packet with AES
-Input : buffer - encrypted packet
-Output:
-*/
-Buffer Communicator::decryptPacket(Buffer buffer) const
-{
-	return Buffer();
-}
-
-/*
-Encrypting packet with AES
-Input : buffer - packet to encrypt
-Output:
-*/
-Buffer Communicator::encryptPacket(Buffer buffer) const
-{
-	return Buffer();
 }

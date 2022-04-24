@@ -82,6 +82,9 @@ RequestResult RoomRequestHandler::leaveRoom(RequestInfo request)
     // Inits:
     RequestResult result;
 
+    // Getting the other player:
+    string otherUser = (m_room.getAllUsers()[0] != m_user.getUsername()) ? m_room.getAllUsers()[0] : m_room.getAllUsers()[1];
+
     // Removing the current user from the room:
     m_roomManager.getRoom(m_room.getRoomData().id)->removeUser(m_user);
 
@@ -92,14 +95,18 @@ RequestResult RoomRequestHandler::leaveRoom(RequestInfo request)
         m_roomManager.getRoom(m_room.getRoomData().id)->setCurrentMove("OPPONENT LEFT");
         m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false);
 
-        // Getting the other player:
-        string otherUser = (m_room.getAllUsers()[0] != m_user.getUsername()) ? m_room.getAllUsers()[0] : m_room.getAllUsers()[1];
-
         // Adding the stats:
         m_roomManager.getDatabase()->addStatistics(m_user.getUsername(), LOST_GAME);
         m_roomManager.getDatabase()->addStatistics(otherUser, WON_GAME);
         m_roomManager.getRoom(m_room.getRoomData().id)->setWinner(otherUser);
-        std::cout << "Win\n";
+        std::cout << "User Left\n";
+
+        // Sending the update message to the other player:
+        RequestInfo rqInfo;
+        RequestResult rqRes = getRoomState(rqInfo);
+        if (!send(Communicator::m_initiateCommunicationSockets[otherUser], (char*)&AES::encrypt(rqRes.buffer)[0], AES::encrypt(rqRes.buffer).size(), 0)) {
+            throw std::exception("Could not send message back to client");
+        }
     }
 
     // Condition: 0 users in the room
@@ -118,7 +125,7 @@ RequestResult RoomRequestHandler::leaveRoom(RequestInfo request)
         
         // Deleting the room:
         m_roomManager.deleteRoom(m_room.getRoomData().id);
-        std::cout << "Delete\n";
+        std::cout << "Deleted Room\n";
     }
 
     // Creating response:
@@ -141,6 +148,7 @@ RequestResult RoomRequestHandler::submitMove(RequestInfo request)
     // Inits:
     RequestResult result;
     SubmitMoveRequest deserializedRequest = JsonRequestPacketDeserializer::deserializeSubmitMoveRequest(request.buffer);
+    string otherUser = (m_room.getAllUsers()[0] != m_user.getUsername()) ? m_room.getAllUsers()[0] : m_room.getAllUsers()[1];
 
     // Creating Response:
     m_roomManager.getRoom(m_room.getRoomData().id)->setCurrentMove(deserializedRequest.move);
@@ -153,7 +161,6 @@ RequestResult RoomRequestHandler::submitMove(RequestInfo request)
         // Adding the stats:
         m_roomManager.getDatabase()->addStatistics(m_user.getUsername(), WON_GAME);
         m_roomManager.getRoom(m_room.getRoomData().id)->setWinner(m_user.getUsername());
-        string otherUser = (m_room.getAllUsers()[0] != m_user.getUsername()) ? m_room.getAllUsers()[0] : m_room.getAllUsers()[1];
         m_roomManager.getDatabase()->addStatistics(otherUser, LOST_GAME);
         m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false);
     }
@@ -164,9 +171,15 @@ RequestResult RoomRequestHandler::submitMove(RequestInfo request)
         // Adding the stats:
         m_roomManager.getDatabase()->addStatistics(m_user.getUsername(), TIED_GAME);
         m_roomManager.getRoom(m_room.getRoomData().id)->setWinner("!TIE!");
-        string otherUser = (m_room.getAllUsers()[0] != m_user.getUsername()) ? m_room.getAllUsers()[0] : m_room.getAllUsers()[1];
         m_roomManager.getDatabase()->addStatistics(otherUser, TIED_GAME);
         m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false);
+    }
+    
+    // Sending the update message to the other player:
+    RequestInfo rqInfo;
+    RequestResult rqRes = getRoomState(rqInfo);
+    if (!send(Communicator::m_initiateCommunicationSockets[otherUser], (char*)&AES::encrypt(rqRes.buffer)[0], AES::encrypt(rqRes.buffer).size(), 0)) {
+        throw std::exception("Could not send message back to client");
     }
 
     // Creating result:

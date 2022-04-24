@@ -9,6 +9,7 @@ public class Data : MonoBehaviour
     // Fields:
     public static Data instance;
     public Communicator communicator;
+    public Communicator listener;
     public string username;
     public string profileUsername;
     public bool isWhite = true;
@@ -37,6 +38,7 @@ public class Data : MonoBehaviour
 
         // Creating the communicator object:
         instance.communicator = new Communicator();
+        instance.listener = new Communicator();
 
         // Condition: not first session
         if (false) // TODO: CHANGE TO DB SETTINGS

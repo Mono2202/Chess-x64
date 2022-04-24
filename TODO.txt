@@ -70,3 +70,4 @@
 - look at chess.com ui
 - IMPORTANT: allow only english characters
 - light theme?
+- add mutex to Communicator::m_initiateCommunicationSockets
