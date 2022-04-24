@@ -77,3 +77,4 @@
 - TURN ALL NUMBERS TO CONSTANTS / DEFINES
 - option to draw arrows
 - grab piece instead of pressing 2 squares
+- DISPLAY MOVES MID GAME WITH Algebraic notation
