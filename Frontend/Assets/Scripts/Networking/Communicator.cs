@@ -6,17 +6,16 @@ using UnityEngine;
 public class Communicator
 {
     // Fields:
-    private NetworkStream m_socket;
+    public NetworkStream m_socket;
     private AES m_aes;
 
     // Constants:
     private const string IP = "127.0.0.1";
-    private const int PORT = 54321;
     private const int SIZE = 4096;
 
 
     // C'tor:
-    public Communicator()
+    public Communicator(int port)
     {
         // Inits:
         m_aes = new AES();
@@ -25,7 +24,7 @@ public class Communicator
         try
         {
             TcpClient client = new TcpClient();
-            IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IP), PORT);
+            IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IP), port);
             client.Connect(serverEndPoint);
             m_socket = client.GetStream();
         }

@@ -10,9 +10,11 @@
 #include "JsonRequestPacketDeserializer.h"
 #include <WinSock2.h>
 #include "AES.h"
+#include "Client.h"
 
 // Defines:
 #define PORT 54321
+#define PORT_LISTENER 12345
 #define SIZE 4096
 
 // Using:
@@ -33,6 +35,9 @@ public:
 	// Methods:
 	void startHandleRequests();
 
+	// Static Fields:
+	static map<SOCKET, Client*> m_clients;
+
 private:
 	// Private C'tor:
 	Communicator(RequestHandlerFactory& handlerFactory);
@@ -40,12 +45,10 @@ private:
 	// Fields:
 	static Communicator* m_communicatorInstance;
 	SOCKET m_serverSocket;
-	map<SOCKET, IRequestHandler*> m_clients;
+	SOCKET m_serverListener;
 	RequestHandlerFactory& m_handlerFactory;
 
 	// Private Methods:
 	void bindAndListen();
 	void handleNewClient(SOCKET sock);
-	Buffer decryptPacket(Buffer buffer) const;
-	Buffer encryptPacket(Buffer buffer) const;
 };

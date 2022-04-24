@@ -3,6 +3,7 @@
 // Includes:
 #include "IRequestHandler.h"
 #include "RoomManager.h"
+#include "Communicator.h"
 #include <string>
 #include <iostream>
 #include <iomanip>
