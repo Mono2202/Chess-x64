@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -10,14 +11,17 @@ public class Board : MonoBehaviour
 {
     // Fields:
     private Communicator communicator;
+    private Communicator listener;
     public GameObject cell;
     public Transform canvas;
     public List<Sprite> chessSprites = new List<Sprite>();
-    public GameObject returnButton;
+    public Button returnButton;
     public GameObject returnButtonSignResign;
     public GameObject returnButtonSignLeave;
     public Text returnButtonText;
     public GameObject popupWindow;
+    public Text whiteUsername;
+    public Text blackUsername;
     [HideInInspector] public GameObject[,] guiBoardArr = new GameObject[BOARD_SIZE, BOARD_SIZE];
     [HideInInspector] public Piece[,] boardArr = new Piece[BOARD_SIZE, BOARD_SIZE];
     [HideInInspector] public string currentMove;
@@ -27,6 +31,13 @@ public class Board : MonoBehaviour
     [HideInInspector] public bool isCurrentPlayerWhite;
     [HideInInspector] public string playerMove;
     [HideInInspector] public bool gameOver = false;
+    [HideInInspector] public bool gameOverBoard = false;
+    [HideInInspector] public bool updateBoardFlag = false;
+    [HideInInspector] public string status = "";
+    [HideInInspector] public Color32 titleColor;
+    [HideInInspector] public Color32 textColor;
+    [HideInInspector] public Thread tSubmitMove;
+    [HideInInspector] public Thread tGetState;
 
     // Constants:
     public const int BOARD_SIZE = 8;
@@ -76,6 +87,8 @@ public class Board : MonoBehaviour
     {
         // Inits:
         communicator = Data.instance.communicator;
+        listener = Data.instance.listener;
+        listener.m_socket.Flush();
 
         // Sending the get room state request:
         communicator.Write(Serializer.SerializeRequest<GetRoomStateRequest>(new GetRoomStateRequest { }, Serializer.GET_ROOM_STATE_REQUEST));
@@ -89,6 +102,10 @@ public class Board : MonoBehaviour
         currentMove = response.CurrentMove;
         isCurrentPlayerWhite = true;
         playerMove = "";
+
+        // Setting the players:
+        whiteUsername.text = startingColors[0];
+        blackUsername.text = startingColors[2];
 
         // Creating the chess board:
         for (int i = 0; i < BOARD_SIZE; i++)
@@ -104,14 +121,17 @@ public class Board : MonoBehaviour
         }
 
         // Starting communication with server about game state:
-        StartCoroutine(GetGameState());
+        tSubmitMove = new Thread(new ThreadStart(SubmitMove));
+        tGetState = new Thread(new ThreadStart(GetState));
+        tSubmitMove.Start();
+        tGetState.Start();
     }
 
     // Update is called once per frame
     void Update()
     {
         // Condition: move was played
-        if (selectedPiece != null && selectedDest != null && playerMove == "")
+        if (selectedPiece != null && selectedDest != null && playerMove == "" && !gameOverBoard)
         {
             if (boardArr[selectedPiece.row, selectedPiece.col].GetLegalMoves(boardArr, currentMove).Any(move => (move.Value != null && move.Value.row == selectedDest.row && move.Value.col == selectedDest.col)))
             {
@@ -121,96 +141,126 @@ public class Board : MonoBehaviour
                 // Updating the current move:
                 currentMove = playerMove;
 
-                // Switching players:
-                isCurrentPlayerWhite = !isCurrentPlayerWhite;
-
                 // Updating the board:
                 UpdateBoard(selectedPiece, selectedDest);
             }
-            
+
             // Resetting the properties:
             selectedPiece = null;
             selectedDest = null;
         }
+
+        // Condition: board needs to be updated
+        if (updateBoardFlag)
+        {
+            // Resetting the flag:
+            updateBoardFlag = false;
+
+            // Updating the board:
+            UpdateBoard(new Position(currentMove[2] - '1', currentMove[1] - 'a'),
+                new Position(currentMove[4] - '1', currentMove[3] - 'a'));
+        }
+
+        // Condition: game is over
+        if (gameOver)
+        {
+            gameOver = false;
+            GameOver();
+        }
     }
 
-    private IEnumerator GetGameState()
+    private void SubmitMove()
     {
         while (true)
         {
-            // Waiting:
-            yield return new WaitForSeconds(Data.DELAY_TIME);
-            
-            // Current player has played:
-            if (playerMove != "")
+            // Condition: current player playes
+            if (isCurrentPlayerWhite == isPlayerWhite && playerMove != "")
             {
                 // Sending the submit move request:
                 communicator.Write(Serializer.SerializeRequest<SubmitMoveRequest>(new SubmitMoveRequest { Move = playerMove }, Serializer.SUBMIT_MOVE_REQUEST));
-                
+
                 // Reading the response:
                 string msg = communicator.Read();
 
                 // Condition: game ended with win
                 if (playerMove.Contains("#"))
                 {
-                    GameOver("Win", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
-                    yield break;
+                    gameOver = true;
+                    gameOverBoard = true;
+                    status = "Win";
+                    titleColor = new Color32(8, 171, 0, 255);
+                    textColor = new Color32(8, 171, 0, 255);
+                    return;
                 }
 
                 // Condition: game ended with tie
                 else if (playerMove.Contains("%"))
                 {
-                    GameOver("Tie", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
-                    yield break;
+                    gameOver = true;
+                    gameOverBoard = true;
+                    status = "Tie";
+                    titleColor = new Color32(8, 171, 0, 255);
+                    textColor = new Color32(8, 171, 0, 255);
+                    return;
                 }
 
                 // Resetting the player's move:
                 playerMove = "";
-            }
 
-            else
+                // Switching players:
+                isCurrentPlayerWhite = !isCurrentPlayerWhite;
+            }
+        }
+    }
+
+    private void GetState()
+    {
+        while (true)
+        {
+            // Deserializing the response:
+            GetRoomStateResponse response = Deserializer.DeserializeResponse<GetRoomStateResponse>(listener.Read());
+            print(response.CurrentMove);
+            // Switching players:
+            isCurrentPlayerWhite = !isCurrentPlayerWhite;
+
+            // Updating the current move:
+            currentMove = response.CurrentMove;
+
+            // Condition: game ended with lose
+            if (currentMove.Contains("#"))
             {
-                // Sending the get room state request:
-                communicator.Write(Serializer.SerializeRequest<GetRoomStateRequest>(new GetRoomStateRequest { }, Serializer.GET_ROOM_STATE_REQUEST));
-
-                // Deserializing the response:
-                GetRoomStateResponse response = Deserializer.DeserializeResponse<GetRoomStateResponse>(communicator.Read());
-
-                // Condition: a move has been played
-                if (response.CurrentMove != currentMove)
-                {
-                    // Switching players:
-                    isCurrentPlayerWhite = !isCurrentPlayerWhite;
-
-                    // Updating the current move:
-                    currentMove = response.CurrentMove;
-
-                    // Condition: game ended with lose
-                    if (currentMove.Contains("#"))
-                    {
-                        GameOver("Lose", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
-                        yield break;
-                    }
-
-                    // Condition: game ended with tie
-                    else if (currentMove.Contains("%"))
-                    {
-                        GameOver("Tie", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
-                        yield break;
-                    }
-
-                    // Condition: game ended with win
-                    else if (currentMove.Contains("OPPONENT LEFT"))
-                    {
-                        GameOver("Win", new Color32(8, 171, 0, 255), new Color32(8, 171, 0, 255));
-                        yield break;
-                    }
-
-                    // Updating the board:
-                    UpdateBoard(new Position(currentMove[2] - '1', currentMove[1] - 'a'),
-                        new Position(currentMove[4] - '1', currentMove[3] - 'a'));
-                }
+                gameOver = true;
+                gameOverBoard = true;
+                status = "Lose";
+                titleColor = new Color32(240, 41, 41, 255);
+                textColor = new Color32(240, 41, 41, 255);
+                return;
             }
+
+            // Condition: game ended with tie
+            else if (currentMove.Contains("%"))
+            {
+                gameOver = true;
+                gameOverBoard = true;
+                status = "Tie";
+                titleColor = new Color32(8, 171, 0, 255);
+                textColor = new Color32(8, 171, 0, 255);
+                return;
+            }
+
+            // Condition: game ended with win
+            else if (currentMove.Contains("OPPONENT LEFT"))
+            {
+                gameOver = true;
+                gameOverBoard = true;
+                status = "Win";
+                titleColor = new Color32(8, 171, 0, 255);
+                textColor = new Color32(8, 171, 0, 255);
+                return;
+            }
+
+            // Setting the update board flag:
+            updateBoardFlag = true;
         }
     }
 
@@ -241,7 +291,7 @@ public class Board : MonoBehaviour
         currentCell.transform.SetParent(canvas, false);
 
         // Positioning the cell:
-        currentCell.transform.localPosition = new Vector3(-350 / 2 + j * 50, 350 / 2 - i * 50, 0);
+        currentCell.transform.localPosition = new Vector3(-350 / 2 + j * 50, 350 / 2 - i * 50, 0); // TODO: TURN TO CONSTANTS
 
         // Creating the chess sprite game object:
         GameObject chessSprite = new GameObject();
@@ -289,6 +339,10 @@ public class Board : MonoBehaviour
 
     public void ReturnToMenu()
     {
+        // Aborting the threads:
+        tSubmitMove.Abort();
+        tGetState.Abort();
+
         // Sending the leave room request:
         communicator.Write(Serializer.SerializeRequest<LeaveRoomRequest>(new LeaveRoomRequest { }, Serializer.LEAVE_ROOM_REQUEST));
 
@@ -299,11 +353,8 @@ public class Board : MonoBehaviour
         this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.MENU_SCENE_COUNT);
     }
 
-    private void GameOver(string status, Color32 titleColor, Color32 textColor)
+    private void GameOver()
     {
-        // Setting the flag:
-        gameOver = true;
-
         // Opening the popup window:
         popupWindow.GetComponent<PopupWindow>().SetProperties("Results", status, titleColor, textColor);
         popupWindow.SetActive(true);

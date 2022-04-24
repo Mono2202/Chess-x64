@@ -9,6 +9,7 @@ public class Data : MonoBehaviour
     // Fields:
     public static Data instance;
     public Communicator communicator;
+    public Communicator listener;
     public string username;
     public string profileUsername;
     public bool isWhite = true;
@@ -29,6 +30,9 @@ public class Data : MonoBehaviour
 
     public const float DELAY_TIME = 0.5f;
 
+    public const int PORT = 54321;
+    public const int PORT_LISTENER = 12345;
+
     // Methods:
     private void Awake()
     {
@@ -36,7 +40,8 @@ public class Data : MonoBehaviour
         instance = this;
 
         // Creating the communicator object:
-        instance.communicator = new Communicator();
+        instance.communicator = new Communicator(PORT);
+        instance.listener = new Communicator(PORT_LISTENER);
 
         // Condition: not first session
         if (false) // TODO: CHANGE TO DB SETTINGS

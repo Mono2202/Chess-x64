@@ -1,5 +1,6 @@
 #include "Communicator.h"
 Communicator* Communicator::m_communicatorInstance = nullptr;
+map<SOCKET, Client*> Communicator::m_clients;
 
 // C'tors:
 
@@ -10,6 +11,13 @@ Communicator::Communicator(RequestHandlerFactory& handlerFactory) : m_handlerFac
 	
 	// Condition: error while creating the socket
 	if (m_serverSocket == INVALID_SOCKET)
+		throw std::exception("Could not create server socket\n");
+
+	// Creating the socket:
+	m_serverListener = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	// Condition: error while creating the socket
+	if (m_serverListener == INVALID_SOCKET)
 		throw std::exception("Could not create server socket\n");
 }
 
@@ -33,6 +41,14 @@ Communicator::~Communicator()
 
 	// Catching exceptions:
 	catch (...) {   }
+
+	// Trying to close the socket:
+	try {
+		::closesocket(m_serverListener);
+	}
+
+	// Catching exceptions:
+	catch (...) {}
 
 	for (auto& client : m_clients)
 	{
@@ -61,14 +77,20 @@ void Communicator::startHandleRequests()
 	{
 		// Creating a new client socket:
 		SOCKET newClientSock = accept(m_serverSocket, NULL, NULL);
+		SOCKET newClientListener = accept(m_serverListener, NULL, NULL);
 
 		// Condition: new socket creation failed
 		if (newClientSock == INVALID_SOCKET) {
 			throw std::exception("Can't connect to new client socket");
 		}
 
+		// Condition: new socket creation failed
+		if (newClientListener == INVALID_SOCKET) {
+			throw std::exception("Can't connect to new client socket");
+		}
+
 		// Inserting the new client to the client map:
-		m_clients.insert(std::pair<SOCKET, IRequestHandler*>(newClientSock, m_handlerFactory.createLoginRequestHandler()));
+		m_clients.insert(std::pair<SOCKET, Client*>(newClientSock, new Client(m_handlerFactory.createLoginRequestHandler(), "", newClientListener)));
 		
 		// Creating the client thread:
 		thread newClientThread(&Communicator::handleNewClient, this, newClientSock);
@@ -90,10 +112,15 @@ void Communicator::bindAndListen()
 {
 	// Inits:
 	struct sockaddr_in sa = { 0 };
+	struct sockaddr_in saListener = { 0 };
 
 	// Socket address inits:
 	sa.sin_port = htons(PORT);
 	sa.sin_family = AF_INET;
+
+	// Socket address inits:
+	saListener.sin_port = htons(PORT_LISTENER);
+	saListener.sin_family = AF_INET;
 
 	// Binding the socket:
 	if (::bind(m_serverSocket, (struct sockaddr*)&sa, sizeof(sa)) == SOCKET_ERROR) {
@@ -102,6 +129,16 @@ void Communicator::bindAndListen()
 
 	// Listening to the socket:
 	if (::listen(m_serverSocket, SOMAXCONN) == SOCKET_ERROR) {
+		throw std::exception("Failed in initiating server socket listening\n");
+	}
+
+	// Binding the socket:
+	if (::bind(m_serverListener, (struct sockaddr*)&saListener, sizeof(saListener)) == SOCKET_ERROR) {
+		throw std::exception("Failed in server socket binding\n");
+	}
+
+	// Listening to the socket:
+	if (::listen(m_serverListener, SOMAXCONN) == SOCKET_ERROR) {
 		throw std::exception("Failed in initiating server socket listening\n");
 	}
 }
@@ -141,11 +178,16 @@ void Communicator::handleNewClient(SOCKET sock)
 			rqInfo.receivalTime = time(NULL);
 
 			// Condition: relevant request
-			if (m_clients.at(sock)->isRequestRelevant(rqInfo)) {
+			if (m_clients.at(sock)->getHandler()->isRequestRelevant(rqInfo)) {
 				// Building the RequestResult struct:
 				try {
 					std::cout << "ID: " << rqInfo.id << std::endl;
-					rqResult = m_clients.at(sock)->handleRequest(rqInfo);
+					rqResult = m_clients.at(sock)->getHandler()->handleRequest(rqInfo);
+
+					// Inserting the client with the name:
+					if (rqInfo.id == LOGIN_REQUEST) {
+						m_clients[sock]->setUsername(JsonRequestPacketDeserializer::deserializeLoginRequest(rqInfo.buffer).username);
+					}
 				}
 
 				// Catching Request Error:
@@ -168,13 +210,11 @@ void Communicator::handleNewClient(SOCKET sock)
 
 			// Condition: updating the handler
 			if (rqResult.newHandler != nullptr) {
-				delete m_clients.find(sock)->second;
-				m_clients.find(sock)->second = rqResult.newHandler;
+				delete m_clients.find(sock)->second->getHandler();
+				m_clients.find(sock)->second->setHandler(rqResult.newHandler);
 			}
 
 			// Sending the a message to the client:
-			Buffer s1 = AES::encrypt(rqResult.buffer);
-			char* s = (char*)&AES::encrypt(rqResult.buffer)[0];
 			if (!send(sock, (char*)&AES::encrypt(rqResult.buffer)[0], AES::encrypt(rqResult.buffer).size(), 0)) {
 				throw std::exception("Could not send message back to client");
 			}
@@ -189,7 +229,7 @@ void Communicator::handleNewClient(SOCKET sock)
 		RequestResult requestResult;
 
 		// Condition: Leave Room
-		if (dynamic_cast<RoomRequestHandler*>(m_clients.find(sock)->second)) {
+		if (dynamic_cast<RoomRequestHandler*>(m_clients.find(sock)->second->getHandler())) {
 			// Inits:
 			RequestInfo rqInfo;
 			int i = 0;
@@ -201,15 +241,15 @@ void Communicator::handleNewClient(SOCKET sock)
 			rqInfo.receivalTime = time(NULL);
 
 			// Leaving the room:
-			requestResult = m_clients.find(sock)->second->handleRequest(rqInfo);
+			requestResult = m_clients.at(sock)->getHandler()->handleRequest(rqInfo);
 
 			// Changing handlers:
-			delete m_clients.find(sock)->second;
-			m_clients.find(sock)->second = requestResult.newHandler;
+			delete m_clients.find(sock)->second->getHandler();
+			m_clients.find(sock)->second->setHandler(requestResult.newHandler);
 		}
 
 		// Condition: Logging-out
-		if (dynamic_cast<MenuRequestHandler*>(m_clients.find(sock)->second)) {
+		if (dynamic_cast<MenuRequestHandler*>(m_clients.find(sock)->second->getHandler())) {
 			// Inits:
 			RequestInfo rqInfo;
 			int i = 0;
@@ -221,8 +261,8 @@ void Communicator::handleNewClient(SOCKET sock)
 			rqInfo.receivalTime = time(NULL);
 
 			// Logging-out:
-			m_clients.find(sock)->second->handleRequest(rqInfo);
-			delete m_clients.find(sock)->second;
+			m_clients.at(sock)->getHandler()->handleRequest(rqInfo);
+			delete m_clients.find(sock)->second->getHandler();
 			m_clients.find(sock)->second = nullptr;
 		}
 
@@ -234,24 +274,4 @@ void Communicator::handleNewClient(SOCKET sock)
 	// Deleting the client:
 	m_clients.erase(sock);
 	::closesocket(sock);
-}
-
-/*
-Decrypt packet with AES
-Input : buffer - encrypted packet
-Output:
-*/
-Buffer Communicator::decryptPacket(Buffer buffer) const
-{
-	return Buffer();
-}
-
-/*
-Encrypting packet with AES
-Input : buffer - packet to encrypt
-Output:
-*/
-Buffer Communicator::encryptPacket(Buffer buffer) const
-{
-	return Buffer();
 }
