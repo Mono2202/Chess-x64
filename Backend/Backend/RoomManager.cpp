@@ -158,8 +158,3 @@ RoomData RoomManager::getPrivateRoom(const string& roomCode) const
 	// Condition: no game was found
 	return currentRoomData;
 }
-
-IDatabase* RoomManager::getDatabase() const
-{
-	return m_database;
-}
