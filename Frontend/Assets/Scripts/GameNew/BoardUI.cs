@@ -10,7 +10,7 @@ namespace Chess.Game
         public PieceTheme pieceTheme;
         public BoardTheme boardTheme;
         public bool showLegalMoves;
-        public bool whiteIsBottom = true;
+        public bool whiteIsBottom;
         public Shader squareShader;
         public Material squareMaterial;
 
@@ -32,7 +32,6 @@ namespace Chess.Game
         {
             // Inits:
             moveGenerator = new MoveGenerator();
-            CreateBoardUI();
         }
 
          /*
@@ -234,9 +233,10 @@ namespace Chess.Game
          * Input : < None >
          * Output: < None >
          */
-        void CreateBoardUI()
+        public void CreateBoardUI(bool whiteBottom)
         {
             // Inits:
+            whiteIsBottom = whiteBottom;
             squareRenderers = new MeshRenderer[8, 8];
             squarePieceRenderers = new SpriteRenderer[8, 8];
 

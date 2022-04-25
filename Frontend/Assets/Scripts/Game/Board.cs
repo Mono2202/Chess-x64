@@ -219,7 +219,7 @@ public class Board : MonoBehaviour
         {
             // Deserializing the response:
             GetRoomStateResponse response = Deserializer.DeserializeResponse<GetRoomStateResponse>(listener.Read());
-            print(response.CurrentMove);
+            
             // Switching players:
             isCurrentPlayerWhite = !isCurrentPlayerWhite;
 

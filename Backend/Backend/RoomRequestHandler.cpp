@@ -156,16 +156,29 @@ RequestResult RoomRequestHandler::submitMove(RequestInfo request)
     RequestResult result;
     SubmitMoveRequest deserializedRequest = JsonRequestPacketDeserializer::deserializeSubmitMoveRequest(request.buffer);
     string otherUser = (m_room.getAllUsers()[0] != m_user.getUsername()) ? m_room.getAllUsers()[0] : m_room.getAllUsers()[1];
+    string move = "";
+    string gameState = "";
+
+    // Getting the move and the game state:
+    string deserializedMove = deserializedRequest.move;
+    string delimiter = "-";
+    size_t pos = 0;
+    while ((pos = deserializedMove.find(delimiter)) != std::string::npos) {
+        move = deserializedMove.substr(0, pos);
+        deserializedMove.erase(0, pos + delimiter.length());
+    }
+    gameState = deserializedMove;
 
     // Creating Response:
-    m_roomManager.getRoom(m_room.getRoomData().id)->setCurrentMove(deserializedRequest.move);
-    m_roomManager.getRoom(m_room.getRoomData().id)->addMove(deserializedRequest.move);
+    m_roomManager.getRoom(m_room.getRoomData().id)->setCurrentMove(move);
+    m_roomManager.getRoom(m_room.getRoomData().id)->addMove(move);
     SubmitMoveResponse response = { SUCCESS_STATUS };
 
     // Checking if the game has ended by win:
-    if (deserializedRequest.move.find('#') != std::string::npos)
+    if (gameState == "WhiteIsMated" || gameState == "BlackIsMated")
     {
         // Adding the stats:
+        std::cout << "WIN\n";
         m_statisticsManager.addUserStatistics(m_user.getUsername(), WON_GAME);
         m_roomManager.getRoom(m_room.getRoomData().id)->setWinner(m_user.getUsername());
         m_statisticsManager.addUserStatistics(otherUser, LOST_GAME);
@@ -173,9 +186,11 @@ RequestResult RoomRequestHandler::submitMove(RequestInfo request)
     }
 
     // Checking if the game has ended by tie:
-    else if (deserializedRequest.move.find('%') != std::string::npos)
+    else if (gameState == "Stalemate" || gameState == "Repetition" ||
+        gameState == "FiftyMoveRule" || gameState == "InsufficientMaterial")
     {
         // Adding the stats:
+        std::cout << "TIE\n";
         m_statisticsManager.addUserStatistics(m_user.getUsername(), TIED_GAME);
         m_roomManager.getRoom(m_room.getRoomData().id)->setWinner("!TIE!");
         m_statisticsManager.addUserStatistics(otherUser, TIED_GAME);

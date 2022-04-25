@@ -86,3 +86,6 @@
 - Arrow drawer
 - DOCUMENT EVERY FUNCTION
 - numbers to constants, 64, 8
+- create board like past
+- draw offer
+- IMPORTANT: FIX MOVE LAG

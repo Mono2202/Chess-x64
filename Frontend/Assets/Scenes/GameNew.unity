@@ -153,7 +153,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 758936906}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -237,7 +237,7 @@ RectTransform:
   - {fileID: 114438744}
   - {fileID: 838369421}
   m_Father: {fileID: 758936906}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -414,7 +414,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 758936906}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -555,7 +555,6 @@ GameObject:
   - component: {fileID: 758936904}
   - component: {fileID: 758936903}
   - component: {fileID: 758936907}
-  - component: {fileID: 758936909}
   - component: {fileID: 758936908}
   m_Layer: 5
   m_Name: Canvas
@@ -636,13 +635,12 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
-  - {fileID: 1208067337}
   - {fileID: 66860586}
   - {fileID: 140966511}
   - {fileID: 52051799}
   - {fileID: 1826291994}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -675,24 +673,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loadCustomPosition: 0
   customPosition: 
---- !u!114 &758936909
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 758936902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd571ade2bd2fcb46b380f0f5ca2ef1e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pieceTheme: {fileID: 11400000, guid: cbe31ca26406f4fa1b6a30d9e7df7421, type: 2}
-  boardTheme: {fileID: 11400000, guid: f8550f85071754187b518d239482333c, type: 2}
-  showLegalMoves: 1
-  whiteIsBottom: 1
-  squareShader: {fileID: 4800000, guid: 3103e10a2990f487ab04e8871a14a634, type: 3}
-  squareMaterial: {fileID: 2100000, guid: 33addf619c32afe48a1a4d80447f8f52, type: 2}
+  returnButton: {fileID: 1637345195}
+  returnButtonSignResign: {fileID: 946039795}
+  returnButtonSignLeave: {fileID: 1481147734}
+  returnButtonText: {fileID: 723369554}
+  popupWindow: {fileID: 1826291993}
+  whiteUsername: {fileID: 52051800}
+  blackUsername: {fileID: 140966512}
+  isPlayerWhite: 0
+  isCurrentPlayerWhite: 0
+  playerMove: 
+  gameOver: 0
+  gotNewMove: 0
+  currentMove: 0
 --- !u!1001 &838369420
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1017,7 +1010,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1208067336
 GameObject:
@@ -1030,6 +1023,7 @@ GameObject:
   - component: {fileID: 1208067337}
   - component: {fileID: 1208067339}
   - component: {fileID: 1208067338}
+  - component: {fileID: 1208067340}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -1044,16 +1038,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1208067336}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.97453696, y: 0.97453696, z: 0.97453696}
   m_Children: []
-  m_Father: {fileID: 758936906}
-  m_RootOrder: 0
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 549, y: 269.87177}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1208067338
@@ -1094,6 +1088,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1208067336}
   m_CullTransparentMesh: 1
+--- !u!114 &1208067340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208067336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd571ade2bd2fcb46b380f0f5ca2ef1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pieceTheme: {fileID: 11400000, guid: cbe31ca26406f4fa1b6a30d9e7df7421, type: 2}
+  boardTheme: {fileID: 11400000, guid: f8550f85071754187b518d239482333c, type: 2}
+  showLegalMoves: 1
+  whiteIsBottom: 1
+  squareShader: {fileID: 4800000, guid: 3103e10a2990f487ab04e8871a14a634, type: 3}
+  squareMaterial: {fileID: 2100000, guid: 33addf619c32afe48a1a4d80447f8f52, type: 2}
 --- !u!1 &1481147734
 GameObject:
   m_ObjectHideFlags: 0
@@ -1258,8 +1270,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Board, Assembly-CSharp
+      - m_Target: {fileID: 758936908}
+        m_TargetAssemblyTypeName: Chess.Game.GameManager, Assembly-CSharp
         m_MethodName: ReturnToMenu
         m_Mode: 1
         m_Arguments:
@@ -1408,7 +1420,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7156708783668382300, guid: 7d388757169cbaa4dbe8f056312f13ec, type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7156708783668382300, guid: 7d388757169cbaa4dbe8f056312f13ec, type: 3}
       propertyPath: m_AnchorMax.x
@@ -1496,6 +1508,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7d388757169cbaa4dbe8f056312f13ec, type: 3}
+--- !u!1 &1826291993 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7156708783668382301, guid: 7d388757169cbaa4dbe8f056312f13ec, type: 3}
+  m_PrefabInstance: {fileID: 1826291992}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &1826291994 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7156708783668382300, guid: 7d388757169cbaa4dbe8f056312f13ec, type: 3}

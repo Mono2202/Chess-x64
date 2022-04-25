@@ -21,7 +21,7 @@ public class Data : MonoBehaviour
     public const int REGISTER_SCENE_COUNT = 2;
     public const int MENU_SCENE_COUNT = 3;
     public const int SEARCHING_SCENE_COUNT = 4;
-    public const int GAME_SCENE_COUNT = 5;
+    public const int GAME_SCENE_COUNT = 13;
     public const int STATS_SCENE_COUNT = 6;
     public const int BOARD_EDITOR_SCENE_COUNT = 7;
     public const int LOADING_SCENE_COUNT = 8;
