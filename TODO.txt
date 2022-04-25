@@ -82,3 +82,7 @@
 - REMATCH - STAY IN ROOM FOR 10 SECONDS AFTER GAME IS FINISHED
 - IMPORTANT: add to elo match so search by elo to be gamemode="E1000" for players between
   1000-1099 for example (LOOK TODO IN RoomManager.h)
+- Playing against bots
+- Arrow drawer
+- DOCUMENT EVERY FUNCTION
+- numbers to constants, 64, 8
