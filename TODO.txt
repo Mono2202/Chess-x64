@@ -89,3 +89,5 @@
 - create board like past
 - draw offer
 - IMPORTANT: FIX MOVE LAG
+- show taken pieces
+- IMPORTANT: ADD DATA LENGTH TO MESSAGE

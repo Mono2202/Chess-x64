@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using UnityEngine;
 
 public class AES
@@ -65,11 +67,24 @@ public class AES
             }
         }
 
-        return BitConverter.ToString(encrypted);
+        // Converting text data to binary:
+        encrypted = Encoding.ASCII.GetBytes(BitConverter.ToString(encrypted));
+        return string.Join("", encrypted.Select(byt => Convert.ToString(byt, 2).PadLeft(8, '0')));
     }
 
     public string AESDecrypt(string cipher)
     {
+        // Converting binary data to text:
+        cipher = cipher.Replace("\0", String.Empty);
+        var list = new List<Byte>();
+        for (int i = 0; i < cipher.Length; i += 8)
+        {
+            Debug.Log(cipher.Substring(i, 8));
+            string t = cipher.Substring(i, 8);
+            list.Add(Convert.ToByte(t, 2));
+        }
+        cipher = Encoding.ASCII.GetString(list.ToArray());
+
         // Converting hex string to byte array:
         string[] hexValuesSplit = cipher.Split('-');
         byte[] byteValues = new byte[hexValuesSplit.Length];

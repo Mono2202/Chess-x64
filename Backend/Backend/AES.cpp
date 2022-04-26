@@ -33,6 +33,9 @@ Buffer AES::encrypt(Buffer& message)
 	// Closing the python script:
 	_pclose(pipe);
 
+	// Converting the text data to binary:
+	result = textToBinaryString(result);
+
 	return Buffer(result.begin(), result.end());
 }
 
@@ -43,8 +46,10 @@ Output: result  - the decrypted message
 */
 Buffer AES::decrypt(const Buffer& cipher)
 {
+
 	// Inits:
 	string data(cipher.begin(), cipher.end());
+	data = binaryStringToText(data);
 	char buffer[SIZE];
 	string cmd = "AES.exe d \"" + data + "\"";
 	string result = "";
@@ -68,4 +73,47 @@ Buffer AES::decrypt(const Buffer& cipher)
 	}
 
 	return Buffer(result.begin(), result.end());
+}
+
+
+// Helper Methods:
+
+/*
+Converting text data to binary
+Input : data - the data string
+Output: binaryString - the binary data
+*/
+string AES::textToBinaryString(string& data)
+{
+	// Inits:
+	string binaryString = "";
+
+	// Converting the data to a binary string:
+	for (char& _char : data) {
+		binaryString += std::bitset<8>(_char).to_string();
+	}
+
+	return binaryString;
+}
+
+/*
+Converting binary data to text
+Input : binaryString - the data string
+Output: 
+*/
+string AES::binaryStringToText(string& binaryString)
+{
+	// Inits:
+	string text = "";
+	std::stringstream sstream(binaryString);
+
+	// Converting the binary string to text:
+	while (sstream.good())
+	{
+		std::bitset<8> bits;
+		sstream >> bits;
+		text += char(bits.to_ulong());
+	}
+
+	return text;
 }

@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+#include <bitset>
+#include <sstream>
 
 // Defines:
 #define SIZE 4096
@@ -26,4 +28,9 @@ public:
 	// Security Functions:
 	static Buffer encrypt(Buffer& message);
 	static Buffer decrypt(const Buffer& cipher);
+
+private:
+	// Helper Functions:
+	static string textToBinaryString(string& data);
+	static string binaryStringToText(string& binaryString);
 };
