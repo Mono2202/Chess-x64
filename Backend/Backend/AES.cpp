@@ -80,7 +80,7 @@ Buffer AES::decrypt(const Buffer& cipher)
 
 /*
 Converting text data to binary
-Input : data - the data string
+Input : data		 - the data string
 Output: binaryString - the binary data
 */
 string AES::textToBinaryString(string& data)
@@ -99,7 +99,7 @@ string AES::textToBinaryString(string& data)
 /*
 Converting binary data to text
 Input : binaryString - the data string
-Output: 
+Output: text         - the text data
 */
 string AES::binaryStringToText(string& binaryString)
 {
