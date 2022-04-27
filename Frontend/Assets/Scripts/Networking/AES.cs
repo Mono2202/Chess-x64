@@ -79,7 +79,6 @@ public class AES
         var list = new List<Byte>();
         for (int i = 0; i < cipher.Length; i += 8)
         {
-            Debug.Log(cipher.Substring(i, 8));
             string t = cipher.Substring(i, 8);
             list.Add(Convert.ToByte(t, 2));
         }
