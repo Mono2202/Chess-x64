@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 52051801}
   - component: {fileID: 52051800}
   m_Layer: 5
-  m_Name: WhiteUsername
+  m_Name: PlayerUsername
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -396,7 +396,7 @@ GameObject:
   - component: {fileID: 140966513}
   - component: {fileID: 140966512}
   m_Layer: 5
-  m_Name: BlackUsername
+  m_Name: OpponentUsername
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -678,14 +678,21 @@ MonoBehaviour:
   returnButtonSignLeave: {fileID: 1481147734}
   returnButtonText: {fileID: 723369554}
   popupWindow: {fileID: 1826291993}
-  whiteUsername: {fileID: 52051800}
-  blackUsername: {fileID: 140966512}
+  playerUsername: {fileID: 52051800}
+  opponentUsername: {fileID: 140966512}
   isPlayerWhite: 0
   isCurrentPlayerWhite: 0
   playerMove: 
   gameOver: 0
   gotNewMove: 0
   currentMove: 0
+  status: 
+  titleColor:
+    serializedVersion: 2
+    rgba: 0
+  textColor:
+    serializedVersion: 2
+    rgba: 0
 --- !u!1001 &838369420
 PrefabInstance:
   m_ObjectHideFlags: 0

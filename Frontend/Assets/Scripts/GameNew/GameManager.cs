@@ -10,10 +10,19 @@ namespace Chess.Game
 {
     public class GameManager : MonoBehaviour
     {
-
         // Inputs:
         public bool loadCustomPosition;
         public string customPosition;
+        public Button returnButton;
+        public GameObject returnButtonSignResign;
+        public GameObject returnButtonSignLeave;
+        public Text returnButtonText;
+        public GameObject popupWindow;
+        public Text playerUsername;
+        public Text opponentUsername;
+        private Communicator communicator;
+        private Communicator listener;
+        private Thread tGetMove;
 
         // Fields:
         public enum Result { Playing, WhiteIsMated, BlackIsMated, Stalemate, Repetition, FiftyMoveRule, InsufficientMaterial, OpponentResigned }
@@ -27,16 +36,6 @@ namespace Chess.Game
         BoardUI boardUI;
         Result gameResult;
         public Board board { get; private set; }
-        public Button returnButton;
-        public GameObject returnButtonSignResign;
-        public GameObject returnButtonSignLeave;
-        public Text returnButtonText;
-        public GameObject popupWindow;
-        public Text whiteUsername;
-        public Text blackUsername;
-        private Communicator communicator;
-        private Communicator listener;
-        private Thread tGetMove;
         [HideInInspector] public bool isPlayerWhite;
         [HideInInspector] public bool isCurrentPlayerWhite;
         [HideInInspector] public string playerMove;
@@ -70,8 +69,8 @@ namespace Chess.Game
             isCurrentPlayerWhite = true;
 
             // Setting the players:
-            whiteUsername.text = startingColors[0];
-            blackUsername.text = startingColors[2];
+            playerUsername.text = Data.instance.username;
+            opponentUsername.text = (Data.instance.username == startingColors[0]) ? startingColors[2] : startingColors[0];
 
             // Starting communication with server about game state:
             tGetMove = new Thread(new ThreadStart(GetMove));
