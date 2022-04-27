@@ -119,7 +119,6 @@ namespace Chess.Game
         public bool TryGetSquareUnderMouse(Vector2 mouseWorld, out Coord selectedCoord) // TODO: CHANGE TO CANVAS INSTEAD OF CAMERA
         {
             // Inits:
-            Debug.Log(mouseWorld.x + " " + mouseWorld.y);
             int file = (int)(mouseWorld.x * (1 / 1.95f) + 4);
             int rank = (int)(mouseWorld.y * (1 / 1.95f) + 4);
 

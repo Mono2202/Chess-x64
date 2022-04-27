@@ -30,6 +30,7 @@ namespace Chess.Game
         void Start()
         {
             boardUI = FindObjectOfType<BoardUI>();
+            boardUI.CreateBoardUI(true);
             gameMoves = new List<Move>();
             board = new Board();
             NewGame();

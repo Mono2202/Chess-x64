@@ -92,3 +92,4 @@
 - show taken pieces
 - IMPORTANT: ADD DATA LENGTH TO MESSAGE
 - IMPORTANT: MAKE BOARD EDITOR WITH FEN 
+- IMPORTANT: https://stackoverflow.com/questions/64976196/make-inputfield-accept-only-english-letters-numbers-and-symbols
