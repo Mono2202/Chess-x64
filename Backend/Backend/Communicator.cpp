@@ -1,4 +1,7 @@
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
 #include "Communicator.h"
+
 Communicator* Communicator::m_communicatorInstance = nullptr;
 map<SOCKET, Client*> Communicator::m_clients;
 
@@ -6,6 +9,11 @@ map<SOCKET, Client*> Communicator::m_clients;
 
 Communicator::Communicator(RequestHandlerFactory& handlerFactory) : m_handlerFactory(handlerFactory)
 {
+	// Inits:
+	ip = "";
+	port = 0;
+	listenerPort = 0;
+
 	// Creating the socket:
 	m_serverSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	
@@ -58,6 +66,11 @@ Communicator::~Communicator()
 	}
 
 	delete m_communicatorInstance;
+
+	// Resetting fields:
+	ip = "";
+	port = 0;
+	listenerPort = 0;
 }
 
 
@@ -104,6 +117,35 @@ void Communicator::startHandleRequests()
 // Private Methods:
 
 /*
+Reading the config file
+Input : < None >
+Output: < None >
+*/
+void Communicator::readConfig()
+{
+	// Inits:
+	vector<string> lines;
+	string line;
+	std::ifstream configFile;
+	configFile.open(CONFIG_FILE);
+
+	// Reading the config file line by line:
+	while (std::getline(configFile, line)) {
+		lines.push_back(line);
+	}
+
+	// Setting the fields:
+	ip = lines[IP_INDEX].substr(4);
+	port = stoi(lines[PORT_INDEX].substr(6));
+	listenerPort = stoi(lines[LISTENER_PORT_INDEX].substr(14));
+	
+	// Printing the server settings:
+	std::cout << "IP: " << ip << std::endl;
+	std::cout << "PORT: " << port << std::endl;
+	std::cout << "LISTENER PORT: " << listenerPort << std::endl;
+}
+
+/*
 Binding and listening to the client socket
 Input : < None >
 Output: < None >
@@ -113,13 +155,18 @@ void Communicator::bindAndListen()
 	// Inits:
 	struct sockaddr_in sa = { 0 };
 	struct sockaddr_in saListener = { 0 };
+	
+	// Getting the socket settings:
+	readConfig();
 
 	// Socket address inits:
-	sa.sin_port = htons(PORT);
+	sa.sin_port = htons(port);
+	sa.sin_addr.s_addr = inet_addr(ip.c_str());
 	sa.sin_family = AF_INET;
 
 	// Socket address inits:
-	saListener.sin_port = htons(PORT_LISTENER);
+	saListener.sin_port = htons(listenerPort);
+	saListener.sin_addr.s_addr = inet_addr(ip.c_str());
 	saListener.sin_family = AF_INET;
 
 	// Binding the socket:

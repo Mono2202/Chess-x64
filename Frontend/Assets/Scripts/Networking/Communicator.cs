@@ -10,12 +10,10 @@ public class Communicator
     private AES m_aes;
 
     // Constants:
-    private const string IP = "127.0.0.1";
-    private const int SIZE = 4096;
-
+    const int SIZE = 4096;
 
     // C'tor:
-    public Communicator(int port)
+    public Communicator(string ip, int port)
     {
         // Inits:
         m_aes = new AES();
@@ -24,7 +22,7 @@ public class Communicator
         try
         {
             TcpClient client = new TcpClient();
-            IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IP), port);
+            IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(ip), port);
             client.Connect(serverEndPoint);
             m_socket = client.GetStream();
         }

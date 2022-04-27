@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <thread>
+#include <fstream>
 #include "IRequestHandler.h"
 #include "LoginRequestHandler.h"
 #include "JsonResponsePacketSerializer.h"
@@ -13,8 +14,10 @@
 #include "Client.h"
 
 // Defines:
-#define PORT 54321
-#define PORT_LISTENER 12345
+#define CONFIG_FILE "config.txt"
+#define IP_INDEX 0
+#define PORT_INDEX 1
+#define LISTENER_PORT_INDEX 2
 #define SIZE 4096
 
 // Using:
@@ -47,8 +50,12 @@ private:
 	SOCKET m_serverSocket;
 	SOCKET m_serverListener;
 	RequestHandlerFactory& m_handlerFactory;
+	std::string ip;
+	int port;
+	int listenerPort;
 
 	// Private Methods:
+	void readConfig();
 	void bindAndListen();
 	void handleNewClient(SOCKET sock);
 };

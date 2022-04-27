@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -30,18 +31,31 @@ public class Data : MonoBehaviour
 
     public const float DELAY_TIME = 0.5f;
 
-    public const int PORT = 54321;
-    public const int PORT_LISTENER = 12345;
+    private const int IP_INDEX = 0;
+    private const int PORT_INDEX = 1;
+    private const int LISTENER_PORT_INDEX = 2;
 
     // Methods:
     private void Awake()
     {
+        // Inits:
+        string ip = "";
+        int port = 0;
+        int listenerPort = 0;
+
+        // Getting the server settings:
+        ReadConfig(ref ip, ref port, ref listenerPort);
+
+        Debug.Log(ip);
+        Debug.Log(port);
+        Debug.Log(listenerPort);
+
         // Creating the instance:
         instance = this;
 
         // Creating the communicator object:
-        instance.communicator = new Communicator(PORT);
-        instance.listener = new Communicator(PORT_LISTENER);
+        instance.communicator = new Communicator(ip, port);
+        instance.listener = new Communicator(ip, listenerPort);
 
         // Condition: not first session
         if (false) // TODO: CHANGE TO DB SETTINGS
@@ -76,5 +90,17 @@ public class Data : MonoBehaviour
         // Setting the square colors:
         instance.whiteSquareColor = new Color32(255, 255, 255, 255);
         instance.blackSquareColor = new Color32(65, 65, 65, 255);
+    }
+
+    private void ReadConfig(ref string ip, ref int port, ref int listenerPort)
+    {
+        // Inits:
+        string configFilePath = Application.streamingAssetsPath + "/config.txt";
+        string[] configFileLines = File.ReadAllLines(configFilePath);
+
+        // Setting the fields:
+        ip = configFileLines[IP_INDEX].Substring(4);
+        port = int.Parse(configFileLines[PORT_INDEX].Substring(6));
+        listenerPort = int.Parse(configFileLines[LISTENER_PORT_INDEX].Substring(14));
     }
 }
