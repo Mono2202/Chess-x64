@@ -119,7 +119,7 @@ namespace Chess.Game
         public bool TryGetSquareUnderMouse(Vector2 mouseWorld, out Coord selectedCoord) // TODO: CHANGE TO CANVAS INSTEAD OF CAMERA
         {
             // Inits:
-            int file = (int)(mouseWorld.x * (1 / 1.95f) + 4);
+            int file = (int)(mouseWorld.x * (1 / 1.95f) + 3);
             int rank = (int)(mouseWorld.y * (1 / 1.95f) + 4);
 
             // Condition: black POV
@@ -358,7 +358,7 @@ namespace Chess.Game
             // Condition: white POV
             if (whiteIsBottom)
             {
-                return new Vector3(-3.5f + file, -3.5f + rank, depth) * 1.95f;
+                return new Vector3(-2.5f + file, -3.5f + rank, depth) * 1.95f;
             }
 
             // Condition: black POV
