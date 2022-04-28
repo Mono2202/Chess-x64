@@ -16,6 +16,6 @@ public class SwitchScene : MonoBehaviour
     public void SwitchToPersonalProfile()
     {
         Data.instance.profileUsername = Data.instance.username;
-        SceneManager.LoadScene(Data.STATS_SCENE_COUNT);
+        SceneManager.LoadScene(Data.PROFILE_SCENE_COUNT);
     }
 }

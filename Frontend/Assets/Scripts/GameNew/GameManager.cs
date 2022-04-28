@@ -301,7 +301,7 @@ namespace Chess.Game
             string msg = communicator.Read();
 
             // Switching to the menu scene:
-            this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.MENU_SCENE_COUNT);
+            this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.HOME_SCENE_COUNT);
         }
 
         private void GameOver()

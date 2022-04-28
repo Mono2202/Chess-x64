@@ -20,14 +20,15 @@ public class Data : MonoBehaviour
     // Constants:
     public const int LOGIN_SCENE_INDEX = 1;
     public const int REGISTER_SCENE_COUNT = 2;
-    public const int MENU_SCENE_COUNT = 3;
-    public const int SEARCHING_SCENE_COUNT = 4;
-    public const int GAME_SCENE_COUNT = 13;
-    public const int STATS_SCENE_COUNT = 6;
-    public const int BOARD_EDITOR_SCENE_COUNT = 7;
-    public const int LOADING_SCENE_COUNT = 8;
-    public const int PLAY_SCENE_COUNT = 9;
-    public const int PRIVATE_SEARCHING_SCENE_COUNT = 10;
+    public const int HOME_SCENE_COUNT = 3;
+    public const int PLAY_SCENE_COUNT = 4;
+    public const int PRIVATE_ROOM_SCENE_COUNT = 5;
+    public const int SEARCHING_FOR_GAME_SCENE_COUNT = 6;
+    public const int GAME_SCENE_COUNT = 7;
+    public const int BOARD_EDITOR_SCENE_COUNT = 8;
+    public const int PROFILE_SCENE_COUNT = 9;
+    public const int MATCH_HISTORY_SCENE_COUNT = 10;
+    public const int SEARCH_PLAYER_SCENE_COUNT = 11;
 
     public const float DELAY_TIME = 0.5f;
 

@@ -51,6 +51,6 @@ public class Login : MonoBehaviour
         Data.instance.profileUsername = usernameInput.text;
 
         // Switching to the menu scene:
-        this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.MENU_SCENE_COUNT);
+        this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.HOME_SCENE_COUNT);
     }
 }

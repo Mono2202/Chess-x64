@@ -15,29 +15,26 @@ EditorBuildSettings:
     path: Assets/Scenes/Register.unity
     guid: d8eaeda341ed6d44a82b682fe5da2f76
   - enabled: 1
-    path: Assets/Scenes/Menu.unity
+    path: Assets/Scenes/Home.unity
     guid: b76f12fd9c9cd37428a5271a7dfb00cc
   - enabled: 1
-    path: Assets/Scenes/Searching.unity
+    path: Assets/Scenes/Play.unity
+    guid: 15ec4db8f091ba54caefa4317255356e
+  - enabled: 1
+    path: Assets/Scenes/PrivateRoom.unity
+    guid: 1eaa06c63c7d33048aa32dfb3cd2dc01
+  - enabled: 1
+    path: Assets/Scenes/SearchingForGame.unity
     guid: 6a4ad724eac5f5e4c9aa5a14f0c4d1d8
   - enabled: 1
     path: Assets/Scenes/Game.unity
-    guid: b7a94d32991ac7a44a936c971da47e68
-  - enabled: 1
-    path: Assets/Scenes/Profile.unity
-    guid: dc67865f0f097bc4aae325f6d9e5901d
+    guid: 4bcf773788e9bbe41871101662d20b6a
   - enabled: 1
     path: Assets/Scenes/BoardEditor.unity
     guid: ad208b4482d753e4f818833bbccca0fb
   - enabled: 1
-    path: Assets/Scenes/Settings.unity
-    guid: 1233b7b5386d4e44f97460601908ec60
-  - enabled: 1
-    path: Assets/Scenes/CreateRoom.unity
-    guid: 15ec4db8f091ba54caefa4317255356e
-  - enabled: 1
-    path: Assets/Scenes/PrivateSearching.unity
-    guid: 1eaa06c63c7d33048aa32dfb3cd2dc01
+    path: Assets/Scenes/Profile.unity
+    guid: dc67865f0f097bc4aae325f6d9e5901d
   - enabled: 1
     path: Assets/Scenes/MatchHistory.unity
     guid: 9acdbea213a14004c88291286bc51f87
@@ -45,6 +42,6 @@ EditorBuildSettings:
     path: Assets/Scenes/SearchPlayer.unity
     guid: 9fb946d9c012cc844bec22c5e01f0126
   - enabled: 1
-    path: Assets/Scenes/GameNew.unity
-    guid: 4bcf773788e9bbe41871101662d20b6a
+    path: Assets/Scenes/Settings.unity
+    guid: 1233b7b5386d4e44f97460601908ec60
   m_configObjects: {}

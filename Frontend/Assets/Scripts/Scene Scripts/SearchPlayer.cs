@@ -46,6 +46,6 @@ public class SearchPlayer : MonoBehaviour
         Data.instance.profileUsername = usernameInput.text;
 
         // Switching to the profile scene:
-        this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.STATS_SCENE_COUNT);
+        this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.PROFILE_SCENE_COUNT);
     }
 }
