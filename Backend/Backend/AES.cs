@@ -8,14 +8,6 @@ class Aes
         // Inits:
         AesManaged aes = new AesManaged();
 
-        // Generating AES properties:
-        //aes.GenerateKey();
-        //aes.GenerateIV();
-
-        // Writing the key and the IV:
-        //WriteToBinaryFile("KEY", aes.Key);
-        //WriteToBinaryFile("IV", aes.IV);
-
         // Reading the Key and the IV:
         aes.Key = File.ReadAllBytes("KEY");
         aes.IV = File.ReadAllBytes("IV");

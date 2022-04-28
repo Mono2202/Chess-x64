@@ -4,6 +4,7 @@
 #include "IRequestHandler.h"
 #include <WinSock2.h>
 
+// Client Class:
 class Client
 {
 public:
@@ -27,4 +28,3 @@ private:
 	string m_username;
 	SOCKET m_listener;
 };
-

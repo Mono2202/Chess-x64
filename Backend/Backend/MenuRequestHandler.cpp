@@ -242,6 +242,11 @@ RequestResult MenuRequestHandler::searchPrivateRoom(RequestInfo request)
     return result;
 }
 
+/*
+Getting match history of a user
+Input : request - the get match history request
+Output: result  - the request result
+*/
 RequestResult MenuRequestHandler::getMatchHistory(RequestInfo request)
 {
     // Inits:

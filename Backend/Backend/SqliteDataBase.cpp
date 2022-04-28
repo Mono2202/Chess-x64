@@ -430,6 +430,9 @@ int SqliteDatabase::getPasswordCallback(void* data, int argc, char** argv, char*
 	return 0;
 }
 
+/*
+Callback to get games from GAMES table
+*/
 int SqliteDatabase::gamesCallback(void* data, int argc, char** argv, char** azColName)
 {
 	// Inits:
