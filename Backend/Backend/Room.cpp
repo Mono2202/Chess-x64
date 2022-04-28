@@ -37,7 +37,7 @@ void Room::setCurrentMove(string move)
 		vector<string> users = this->getAllUsers();
 		int i = 0;
 
-		// Shuffling the users vector: TODO: CHECK IF ACTUALLY RANDOM
+		// Shuffling the users vector:
 		std::random_shuffle(users.begin(), users.end());
 
 		// Choosing the starting color for each player

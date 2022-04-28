@@ -129,7 +129,6 @@ RoomData RoomManager::getEloRoom() const
 			return room.second.getRoomData();
 		}
 	}
-	// TODO: ADD ELO CHECK
 
 	// Condition: no game was found
 	return currentRoomData;

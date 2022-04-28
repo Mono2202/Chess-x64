@@ -182,7 +182,7 @@ RequestResult RoomRequestHandler::submitMove(RequestInfo request)
         m_statisticsManager.addUserStatistics(m_user.getUsername(), WON_GAME);
         m_roomManager.getRoom(m_room.getRoomData().id)->setWinner(m_user.getUsername());
         m_statisticsManager.addUserStatistics(otherUser, LOST_GAME);
-        m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false); // TODO: REMOVE TO GET REMATCH AFTER 10 SEC, DISABLE ROOM ACTIVITY ONLY WHEN LEAVING
+        m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false);
     }
 
     // Checking if the game has ended by tie:
@@ -194,7 +194,7 @@ RequestResult RoomRequestHandler::submitMove(RequestInfo request)
         m_statisticsManager.addUserStatistics(m_user.getUsername(), TIED_GAME);
         m_roomManager.getRoom(m_room.getRoomData().id)->setWinner("!TIE!");
         m_statisticsManager.addUserStatistics(otherUser, TIED_GAME);
-        m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false); // TODO: REMOVE TO GET REMATCH AFTER 10 SEC, DISABLE ROOM ACTIVITY ONLY WHEN LEAVING
+        m_roomManager.getRoom(m_room.getRoomData().id)->setIsActive(false);
     }
 
     // Updating the other player:

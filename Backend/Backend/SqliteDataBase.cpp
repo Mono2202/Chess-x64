@@ -305,7 +305,6 @@ void SqliteDatabase::addStatistics(const string& username, int gameStatus)
 	}
 
 	// Updating:
-	// TODO: CHANGE ELO GAIN
 	switch (gameStatus)
 	{
 		case WON_GAME: originalWonGames++; originalElo += 25;  break;

@@ -28,7 +28,7 @@ public class MatchHistory : MonoBehaviour
         // Assigning the labels:
         for (int i = 0; i < games.Length; i++)
         {
-            if (games[i] != "")
+            if (games[i] != "" && games[i] != " " && games[i] != "\n")
             {
                 // Inits:
                 string[] currentGame = games[i].Split(new string[] { "&&&" }, StringSplitOptions.None);

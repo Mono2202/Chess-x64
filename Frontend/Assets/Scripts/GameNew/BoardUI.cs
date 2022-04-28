@@ -362,7 +362,7 @@ namespace Chess.Game
             }
 
             // Condition: black POV
-            return new Vector3(-3.5f + 7 - file, 7 - rank - 3.5f, depth) * 1.95f;
+            return new Vector3(-2.5f + 7 - file, 7 - rank - 3.5f, depth) * 1.95f;
 
         }
 
