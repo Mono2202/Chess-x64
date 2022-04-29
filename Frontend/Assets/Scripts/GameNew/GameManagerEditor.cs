@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Chess.Game
 {
@@ -11,6 +13,11 @@ namespace Chess.Game
         // Inputs:
         public bool loadCustomPosition;
         public string customPosition;
+        public InputField inputFEN;
+        public Button inputFENButton;
+        public Button resetButton;
+        public Text inputFENButtonText;
+        public Text bestMoveLabel;
 
         // Fields:
         public enum Result { Playing, WhiteIsMated, BlackIsMated, Stalemate, Repetition, FiftyMoveRule, InsufficientMaterial }
@@ -21,7 +28,7 @@ namespace Chess.Game
         Player playerToMove;
         List<Move> gameMoves;
         BoardUI boardUI;
-        Result gameResult;
+        string currentBestMove;
         public Board board { get; private set; }
 
         /*
@@ -41,10 +48,18 @@ namespace Chess.Game
          */
         void Update()
         {
-            if (gameResult == Result.Playing)
+            // Condition: new best move
+            if (bestMoveLabel.text != currentBestMove)
             {
-                playerToMove.Update();
+                bestMoveLabel.text = currentBestMove;
             }
+
+            // Checking if fields were filled:
+            inputFENButton.interactable = !(inputFEN.text == "");
+            inputFENButtonText.color = !(inputFEN.text == "") ? new Color32(31, 194, 18, 255) : new Color32(31, 194, 18, 100);
+            
+            // Updating moves:
+            playerToMove.Update();
         }
 
         /*
@@ -52,11 +67,24 @@ namespace Chess.Game
          */
         void OnMoveChosen(Move move)
         {
+            // Updating game and board:
             board.MakeMove(move);
             gameMoves.Add(move);
             onMoveMade?.Invoke(move);
             boardUI.OnMoveMade(board, move, false);
             playerToMove = (board.whiteToMove) ? whitePlayer : blackPlayer;
+
+            // Using the engine:
+            try
+            {
+                Thread tEngine = new Thread(new ThreadStart(UseEngine));
+                tEngine.Start();
+            }
+
+            catch
+            {
+                return;
+            }
         }
 
         /*
@@ -72,9 +100,18 @@ namespace Chess.Game
             // Condition: loading a custom position
             if (loadCustomPosition)
             {
-                board.LoadPosition(customPosition);
-            }
+                try
+                {
+                    board.LoadPosition(customPosition);
+                }
 
+                // Condition: loading start position:
+                catch
+                {
+                    board.LoadStartPosition();
+                }
+            }
+            
             // Condition: loading the start position
             else
             {
@@ -91,59 +128,17 @@ namespace Chess.Game
             CreatePlayer(ref blackPlayer);
             playerToMove = (board.whiteToMove) ? whitePlayer : blackPlayer;
 
-            // Setting the current game state:
-            gameResult = Result.Playing;
-        }
-
-        /*
-         * Getting the game state
-         * Input : < None >
-         * Output: the game state result
-         */
-        Result GetGameState()
-        {
-            // Inits:
-            MoveGenerator moveGenerator = new MoveGenerator();
-            var moves = moveGenerator.GenerateMoves(board);
-
-            // Condition: game is over
-            if (moves.Count == 0)
+            // Using the engine:
+            try
             {
-                // Condition: mate
-                if (moveGenerator.InCheck())
-                {
-                    return (board.whiteToMove) ? Result.WhiteIsMated : Result.BlackIsMated;
-                }
-
-                // Condition: stalemate
-                return Result.Stalemate;
+                Thread tEngine = new Thread(new ThreadStart(UseEngine));
+                tEngine.Start();
             }
 
-            // Condition: fifty move rule
-            if (board.fiftyMoveCounter >= 100)
+            catch
             {
-                return Result.FiftyMoveRule;
+                return;
             }
-
-            // Condition: threefold repetition
-            // TODO
-
-            // Condition: insufficient material
-            int numPawns = board.pawns[Board.WHITE_INDEX].Count + board.pawns[Board.BLACK_INDEX].Count;
-            int numRooks = board.rooks[Board.WHITE_INDEX].Count + board.rooks[Board.BLACK_INDEX].Count;
-            int numQueens = board.queens[Board.WHITE_INDEX].Count + board.queens[Board.BLACK_INDEX].Count;
-            int numKnights = board.knights[Board.WHITE_INDEX].Count + board.knights[Board.BLACK_INDEX].Count;
-            int numBishops = board.bishops[Board.WHITE_INDEX].Count + board.bishops[Board.BLACK_INDEX].Count;
-            if (numPawns + numRooks + numQueens == 0)
-            {
-                if (numKnights == 1 || numBishops == 1)
-                {
-                    return Result.InsufficientMaterial;
-                }
-            }
-
-            // Condition: game is still going
-            return Result.Playing;
         }
 
         /*
@@ -160,6 +155,70 @@ namespace Chess.Game
 
             player = new HumanPlayer(board);
             player.onMoveChosen += OnMoveChosen;
+        }
+
+        /*
+         * Loading board with certain FEN
+         * Input : < None >
+         * Output: < None >
+         */
+        public void LoadFEN()
+        {
+            loadCustomPosition = true;
+            customPosition = inputFEN.text;
+            inputFEN.text = "";
+            NewGame();
+        }
+
+        /*
+         * Resetting the board to a default position
+         * Input : < None >
+         * Output: < None >
+         */
+        public void ResetBoard()
+        {
+            loadCustomPosition = false;
+            NewGame();
+        }
+
+        /*
+         * Using Stockfish to get the best move
+         * Input : < None >
+         * Output: < None >
+         */
+        private void UseEngine()
+        {
+            // Getting the current FEN:
+            string fenString = FenUtility.CurrentFen(board);
+
+            // Execute stockfish:
+            var p = new System.Diagnostics.Process();
+            p.StartInfo.FileName = Application.streamingAssetsPath + "/Stockfish.exe";
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.RedirectStandardInput = true;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.CreateNoWindow = true;
+            p.Start();
+
+            // Setting the position:
+            string setupString = "position fen " + fenString;
+            p.StandardInput.WriteLine(setupString);
+
+            // Calculating:
+            string processString = "go depth 5";
+            p.StandardInput.WriteLine(processString);
+
+            // Getting the best move in the current position:
+            string bestMove = p.StandardOutput.ReadLine();
+            while (!bestMove.Contains("bestmove"))
+            {
+                bestMove = p.StandardOutput.ReadLine();
+                print(bestMove);
+            }
+            currentBestMove = bestMove.Substring(9, 4);
+
+            // Closing the process: 
+            p.Close();
         }
     }
 }
