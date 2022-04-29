@@ -34,11 +34,21 @@ namespace Chess.Game
             this.board = board;
         }
 
+        /*
+         * Notifying to move
+         * Input : < None >
+         * Output: < None >
+         */
         public override void NotifyTurnToMove()
         {
 
         }
 
+        /*
+         * Handling user input
+         * Input : < None >
+         * Output: < None >
+         */
         public override void Update()
         {
             HandleInput();

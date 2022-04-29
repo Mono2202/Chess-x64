@@ -227,9 +227,6 @@ namespace Chess.Game
                 return Result.FiftyMoveRule;
             }
 
-            // Condition: threefold repetition
-            // TODO
-
             // Condition: insufficient material
             int numPawns = board.pawns[Board.WHITE_INDEX].Count + board.pawns[Board.BLACK_INDEX].Count;
             int numRooks = board.rooks[Board.WHITE_INDEX].Count + board.rooks[Board.BLACK_INDEX].Count;
@@ -264,6 +261,11 @@ namespace Chess.Game
             player.onMoveChosen += OnMoveChosen;
         }
 
+        /*
+         * Getting opponent's move from the server
+         * Input : < None >
+         * Output: < None >
+         */
         private void GetMove()
         {
             while (true)
@@ -289,6 +291,11 @@ namespace Chess.Game
             }
         }
 
+        /*
+         * Returning to menu
+         * Input : < None >
+         * Output: < None >
+         */
         public void ReturnToMenu()
         {
             // Aborting the thread:
@@ -304,6 +311,11 @@ namespace Chess.Game
             this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.HOME_SCENE_COUNT);
         }
 
+        /*
+         * Activates when game is over
+         * Input : < None >
+         * Output: < None >
+         */
         private void GameOver()
         {
             // Opening the popup window:

@@ -71,7 +71,7 @@
     public void MovePiece(int startSquare, int targetSquare)
     {
         // Get the index of this element in the occupiedSquares array:
-        int pieceIndex = map[startSquare]; // TODO: map[startSquare] = 0?
+        int pieceIndex = map[startSquare];
 
         // Switching location:
         occupiedSquares[pieceIndex] = targetSquare;

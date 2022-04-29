@@ -5,21 +5,21 @@
 
     public static class PrecomputedMoveData
     {
-        // First 4 are orthogonal, last 4 are diagonals (N, S, W, E, NW, SE, NE, SW)
+        // First 4 are orthogonal, last 4 are diagonals (N, S, W, E, NW, SE, NE, SW):
         public static readonly int[] directionOffsets = { 8, -8, -1, 1, 7, -7, 9, -9 };
 
-        // Stores number of moves available in each of the 8 directions for every square on the board
-        // Order of directions is: N, S, W, E, NW, SE, NE, SW
+        // Stores number of moves available in each of the 8 directions for every square on the board.
+        // Order of directions is: N, S, W, E, NW, SE, NE, SW.
         // So for example, if availableSquares[0][1] == 7...
-        // that means that there are 7 squares to the north of b1 (the square with index 1 in board array)
+        // That means that there are 7 squares to the north of b1 (the square with index 1 in board array):
         public static readonly int[][] numSquaresToEdge;
 
-        // Stores array of indices for each square a knight can land on from any square on the board
-        // So for example, knightMoves[0] is equal to {10, 17}, meaning a knight on a1 can jump to c2 and b3
+        // Stores array of indices for each square a knight can land on from any square on the board.
+        // So for example, knightMoves[0] is equal to {10, 17}, meaning a knight on a1 can jump to c2 and b3:
         public static readonly byte[][] knightMoves;
         public static readonly byte[][] kingMoves;
 
-        // Pawn attack directions for white and black (NW, NE; SW SE)
+        // Pawn attack directions for white and black (NW, NE; SW SE):
         public static readonly byte[][] pawnAttackDirections = {
             new byte[] { 4, 6 },
             new byte[] { 7, 5 }
@@ -37,9 +37,10 @@
         public static readonly ulong[] bishopMoves;
         public static readonly ulong[] queenMoves;
 
-        // Aka manhattan distance (answers how many moves for a rook to get from square a to square b)
+        // Aka manhattan distance (answers how many moves for a rook to get from square a to square b):
         public static int[,] orthogonalDistance;
-        // Aka chebyshev distance (answers how many moves for a king to get from square a to square b)
+
+        // Aka chebyshev distance (answers how many moves for a king to get from square a to square b):
         public static int[,] kingDistance;
         public static int[] centreManhattanDistance;
 
@@ -53,22 +54,25 @@
             return kingDistance[startSquare, targetSquare];
         }
 
-        // Initialize lookup data
+        /*
+         * Precomputing moves
+         * Input : < None >
+         * Output: < None >
+         */
         static PrecomputedMoveData()
         {
+            // Inits:
             pawnAttacksWhite = new int[64][];
             pawnAttacksBlack = new int[64][];
             numSquaresToEdge = new int[8][];
             knightMoves = new byte[64][];
             kingMoves = new byte[64][];
             numSquaresToEdge = new int[64][];
-
             rookMoves = new ulong[64];
             bishopMoves = new ulong[64];
             queenMoves = new ulong[64];
 
-            // Calculate knight jumps and available squares for each square on the board.
-            // See comments by variable definitions for more info.
+            // Calculate knight jumps and available squares for each square on the board:
             int[] allKnightJumps = { 15, 17, -17, -15, 10, -6, 6, -10 };
             knightAttackBitboards = new ulong[64];
             kingAttackBitboards = new ulong[64];
@@ -94,7 +98,7 @@
                 numSquaresToEdge[squareIndex][6] = System.Math.Min(north, east);
                 numSquaresToEdge[squareIndex][7] = System.Math.Min(south, west);
 
-                // Calculate all squares knight can jump to from current square
+                // Calculate all squares knight can jump to from current square:
                 var legalKnightJumps = new List<byte>();
                 ulong knightBitboard = 0;
                 foreach (int knightJumpDelta in allKnightJumps)
@@ -104,7 +108,8 @@
                     {
                         int knightSquareY = knightJumpSquare / 8;
                         int knightSquareX = knightJumpSquare - knightSquareY * 8;
-                        // Ensure knight has moved max of 2 squares on x/y axis (to reject indices that have wrapped around side of board)
+
+                        // Ensure knight has moved max of 2 squares on x/y axis (to reject indices that have wrapped around side of board):
                         int maxCoordMoveDst = System.Math.Max(System.Math.Abs(x - knightSquareX), System.Math.Abs(y - knightSquareY));
                         if (maxCoordMoveDst == 2)
                         {
@@ -116,7 +121,7 @@
                 knightMoves[squareIndex] = legalKnightJumps.ToArray();
                 knightAttackBitboards[squareIndex] = knightBitboard;
 
-                // Calculate all squares king can move to from current square (not including castling)
+                // Calculate all squares king can move to from current square (not including castling):
                 var legalKingMoves = new List<byte>();
                 foreach (int kingMoveDelta in directionOffsets)
                 {
@@ -125,7 +130,8 @@
                     {
                         int kingSquareY = kingMoveSquare / 8;
                         int kingSquareX = kingMoveSquare - kingSquareY * 8;
-                        // Ensure king has moved max of 1 square on x/y axis (to reject indices that have wrapped around side of board)
+
+                        // Ensure king has moved max of 1 square on x/y axis (to reject indices that have wrapped around side of board):
                         int maxCoordMoveDst = System.Math.Max(System.Math.Abs(x - kingSquareX), System.Math.Abs(y - kingSquareY));
                         if (maxCoordMoveDst == 1)
                         {
@@ -136,7 +142,7 @@
                 }
                 kingMoves[squareIndex] = legalKingMoves.ToArray();
 
-                // Calculate legal pawn captures for white and black
+                // Calculate legal pawn captures for white and black:
                 List<int> pawnCapturesWhite = new List<int>();
                 List<int> pawnCapturesBlack = new List<int>();
                 pawnAttackBitboards[squareIndex] = new ulong[2];
@@ -169,7 +175,7 @@
                 pawnAttacksWhite[squareIndex] = pawnCapturesWhite.ToArray();
                 pawnAttacksBlack[squareIndex] = pawnCapturesBlack.ToArray();
 
-                // Rook moves
+                // Rook moves:
                 for (int directionIndex = 0; directionIndex < 4; directionIndex++)
                 {
                     int currentDirOffset = directionOffsets[directionIndex];
@@ -179,7 +185,8 @@
                         rookMoves[squareIndex] |= 1ul << targetSquare;
                     }
                 }
-                // Bishop moves
+
+                // Bishop moves:
                 for (int directionIndex = 4; directionIndex < 8; directionIndex++)
                 {
                     int currentDirOffset = directionOffsets[directionIndex];
@@ -214,7 +221,7 @@
                 directionLookup[i] = absDir * System.Math.Sign(offset);
             }
 
-            // Distance lookup
+            // Distance lookup:
             orthogonalDistance = new int[64, 64];
             kingDistance = new int[64, 64];
             centreManhattanDistance = new int[64];

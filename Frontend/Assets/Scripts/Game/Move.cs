@@ -122,6 +122,13 @@
             }
         }
 
+        /*
+         * Checking whether 2 moves are the same
+         * Input : a     - the first move
+         *         b     - the second move
+         * Output: true  - same move
+         *         false - different move
+         */
         public static bool SameMove(Move a, Move b)
         {
             return a.moveValue == b.moveValue;

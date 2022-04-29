@@ -92,11 +92,12 @@
          * Input : board - the board
          * Output: fen - the FEN string
          */
-        public static string CurrentFen(Board board) // TODO: DOCUMENT
+        public static string CurrentFen(Board board)
         {
             // Inits:
             string fen = "";
 
+            // Building the board:
             for (int rank = 7; rank >= 0; rank--)
             {
                 int numEmptyFiles = 0;
@@ -155,11 +156,11 @@
                 }
             }
 
-            // Side to move
+            // Side to move:
             fen += ' ';
             fen += (board.whiteToMove) ? 'w' : 'b';
 
-            // Castling
+            // Castling:
             bool whiteKingside = (board.currentGameState & 1) == 1;
             bool whiteQueenside = (board.currentGameState >> 1 & 1) == 1;
             bool blackKingside = (board.currentGameState >> 2 & 1) == 1;
@@ -171,7 +172,7 @@
             fen += (blackQueenside) ? "q" : "";
             fen += ((board.currentGameState & 15) == 0) ? "-" : "";
 
-            // En-passant
+            // En-passant:
             fen += ' ';
             int epFile = (int)(board.currentGameState >> 4) & 15;
             if (epFile == 0)
@@ -185,11 +186,11 @@
                 fen += fileName + epRank;
             }
 
-            // 50 move counter
+            // 50 move counter:
             fen += ' ';
             fen += board.fiftyMoveCounter;
 
-            // Full-move count (should be one at start, and increase after each move by black)
+            // Full-move count (should be one at start, and increase after each move by black):
             fen += ' ';
             fen += (board.plyCount / 2) + 1;
 
