@@ -18,7 +18,7 @@ public class Data : MonoBehaviour
     public Color32 blackSquareColor = new Color32(65, 65, 65, 255);
 
     // Constants:
-    public const int LOGIN_SCENE_INDEX = 1;
+    public const int LOGIN_SCENE_COUNT = 1;
     public const int REGISTER_SCENE_COUNT = 2;
     public const int HOME_SCENE_COUNT = 3;
     public const int PLAY_SCENE_COUNT = 4;
@@ -50,10 +50,6 @@ public class Data : MonoBehaviour
         // Getting the server settings:
         ReadConfig(ref ip, ref port, ref listenerPort);
 
-        Debug.Log(ip);
-        Debug.Log(port);
-        Debug.Log(listenerPort);
-
         // Creating the instance:
         instance = this;
 
@@ -65,7 +61,7 @@ public class Data : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         // Switching to the login scene:
-        SceneManager.LoadScene(LOGIN_SCENE_INDEX);
+        SceneManager.LoadScene(LOGIN_SCENE_COUNT);
     }
 
     /*

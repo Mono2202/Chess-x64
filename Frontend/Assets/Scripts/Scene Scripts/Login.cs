@@ -11,12 +11,14 @@ public class Login : MonoBehaviour
     public GameObject popupWindow;
     private Communicator communicator;
 
+    // Start is called before the first frame update
     void Start()
     {
         // Inits:
         communicator = Data.instance.communicator;
     }
 
+    // Update is called every frame
     void Update()
     {
         // Checking if fields were filled:
@@ -24,6 +26,11 @@ public class Login : MonoBehaviour
         signInButtonText.color = !(usernameInput.text == "" || passwordInput.text == "") ? new Color32(31, 194, 18, 255) : new Color32(31, 194, 18, 100);
     }
 
+    /*
+     * Sending a login message to the server
+     * Input : < None >
+     * Output: < None >
+     */
     public void SendLoginMessage()
     {
         // Sending the login message:

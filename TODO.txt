@@ -103,3 +103,4 @@
 - MAKE BOARD EDITOR WITH MORE FEATURES
 - CHANGE DEPTH BY USER
 - add user prefrences and settings to change colors
+- Play.cs 53 // TODO: ROOM NOT FOUND, SHOW ERROR MESSAGE

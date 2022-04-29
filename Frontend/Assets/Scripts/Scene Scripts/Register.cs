@@ -19,6 +19,7 @@ public class Register : MonoBehaviour
         communicator = Data.instance.communicator;
     }
 
+    // Update is called every frame
     void Update()
     {
         // Checking if fields were filled:
@@ -26,6 +27,11 @@ public class Register : MonoBehaviour
         signUpButtonText.color = !(usernameInput.text == "" || passwordInput.text == "" || emailInput.text == "") ? new Color32(31, 194, 18, 255) : new Color32(31, 194, 18, 100);
     }
 
+    /*
+     * Sending a register message to the server
+     * Input : < None >
+     * Output: < None >
+     */
     public void SendRegisterMessage()
     {
         // Sending the sign-up request:
@@ -45,6 +51,6 @@ public class Register : MonoBehaviour
         }
 
         // Switching to the login scene:
-        this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.LOGIN_SCENE_INDEX);
+        this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.LOGIN_SCENE_COUNT);
     }
 }

@@ -94,12 +94,14 @@ static class Serializer
     public const int SEARCH_PRIVATE_ROOM_REQUEST = 114;
     public const int GET_MATCH_HISTORY_REQUEST = 115;
 
-
-    // Methods:
-
+    /*
+     * Turning a Request class to a message
+     * Input : request     - the Request class
+     *         requestCode - the Request code
+     * Output: the message to send to the server
+     */
     public static string SerializeRequest<T>(T request, int requestCode)
     {
-        // Returning the buffer:
         return (char)requestCode + JsonConvert.SerializeObject(request);
     }
 }

@@ -45,6 +45,11 @@ public class Searching : MonoBehaviour
         }
     }
 
+    /*
+     * Waiting for player to join the room
+     * Input : < None >
+     * Output: < None >
+     */
     private IEnumerator WaitForPlayer()
     {
         while (true)
@@ -67,6 +72,11 @@ public class Searching : MonoBehaviour
         }
     }
 
+    /*
+     * Returning to menu screen
+     * Input : < None >
+     * Output: < None >
+     */
     public void ReturnToMenu()
     {
         // Sending the leave room request:

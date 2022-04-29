@@ -12,7 +12,9 @@ public class Communicator
     // Constants:
     const int SIZE = 4096;
 
-    // C'tor:
+    /*
+     * C'tor
+     */
     public Communicator(string ip, int port)
     {
         // Inits:
@@ -32,9 +34,6 @@ public class Communicator
             Debug.Log("Error: no connection with server");
         }
     }
-
-
-    // Methods:
 
     /*
      * Sends a message to the server

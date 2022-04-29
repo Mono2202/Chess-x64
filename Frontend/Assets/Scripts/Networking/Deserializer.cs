@@ -115,7 +115,11 @@ class Deserializer
     // Constants:
     public const int ERROR_RESPONSE = 102;
 
-    // Methods:
+    /*
+     * Deserializing the response
+     * Input : buffer - the response
+     * Output: the suitable Response class
+     */
     public static T DeserializeResponse<T>(string buffer)
     {
         // Building the response:

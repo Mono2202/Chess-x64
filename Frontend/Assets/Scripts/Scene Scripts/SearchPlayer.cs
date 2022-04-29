@@ -17,6 +17,7 @@ public class SearchPlayer : MonoBehaviour
         communicator = Data.instance.communicator;
     }
 
+    // Update is called every frame
     void Update()
     {
         // Checking if fields were filled:
@@ -24,6 +25,11 @@ public class SearchPlayer : MonoBehaviour
         searchButtonText.color = !(usernameInput.text == "") ? new Color32(31, 194, 18, 255) : new Color32(31, 194, 18, 100);
     }
 
+    /*
+     * Getting the user's profile
+     * Input : < None >
+     * Output: < None >
+     */
     public void GetProfile()
     {
         // Sending the stats request:

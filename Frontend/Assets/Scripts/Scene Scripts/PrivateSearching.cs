@@ -28,6 +28,11 @@ public class PrivateSearching : MonoBehaviour
         StartCoroutine(WaitForPlayer());
     }
 
+    /*
+     * Waiting for a player to join the room
+     * Input : < None >
+     * Output: < None >
+     */
     private IEnumerator WaitForPlayer()
     {
         while (true)
@@ -50,6 +55,11 @@ public class PrivateSearching : MonoBehaviour
         }
     }
 
+    /*
+     * Copying the room code to the user's clipboard
+     * Input : < None >
+     * Output: < None >
+     */
     public void CopyToClipboard()
     {
         // Copying the room code to the clipboard:
@@ -59,6 +69,11 @@ public class PrivateSearching : MonoBehaviour
         te.Copy();
     }
 
+    /*
+     * Returning to menu screen
+     * Input : < None >
+     * Output: < None >
+     */
     public void ReturnToMenu()
     {
         // Sending the leave room request:

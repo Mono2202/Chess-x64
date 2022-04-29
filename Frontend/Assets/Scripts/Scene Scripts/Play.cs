@@ -26,6 +26,11 @@ public class Play : MonoBehaviour
         joinRoomButtonText.color = !(roomCodeInput.text == "") ? new Color32(31, 194, 18, 255) : new Color32(31, 194, 18, 100);
     }
 
+    /*
+     * Joining a private room
+     * Input : < None >
+     * Output: < None >
+     */
     public void JoinPrivateRoom()
     {
         // Sending the search private room request:
@@ -33,8 +38,6 @@ public class Play : MonoBehaviour
 
         // Deserializing the response:
         SearchPrivateRoomResponse response = Deserializer.DeserializeResponse<SearchPrivateRoomResponse>(communicator.Read());
-
-        print("response: " + response.RoomID);
 
         // Condition: room found
         if (response.RoomID != 0)
@@ -47,12 +50,6 @@ public class Play : MonoBehaviour
 
             // Switching to the game scene:
             this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.GAME_SCENE_COUNT);
-        }
-
-        // Condition: room not found, creating a new room
-        else
-        {
-            return; // TODO: ADD POPUP
         }
     }
 }

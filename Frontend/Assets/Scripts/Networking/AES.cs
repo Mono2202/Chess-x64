@@ -12,6 +12,9 @@ public class AES
     // Fields:
     public AesManaged aes;
 
+    /*
+     * C'tor
+     */
     public AES()
     {
         // Inits:
@@ -32,6 +35,11 @@ public class AES
         };
     }
 
+    /*
+     * Encrypting with AES
+     * Input : data - the data to encrypt
+     * Output: the encrypted data
+     */
     public string AESEncrypt(string data)
     {
         // Converting " to ^:
@@ -72,6 +80,11 @@ public class AES
         return string.Join("", encrypted.Select(byt => Convert.ToString(byt, 2).PadLeft(8, '0')));
     }
 
+    /*
+     * Decrypting with AES
+     * Input : cipher  - the data to decrypt
+     * Output: newData - the decrypted data
+     */
     public string AESDecrypt(string cipher)
     {
         // Converting binary data to text:
