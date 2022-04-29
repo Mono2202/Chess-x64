@@ -213,7 +213,6 @@ namespace Chess.Game
             while (!bestMove.Contains("bestmove"))
             {
                 bestMove = p.StandardOutput.ReadLine();
-                print(bestMove);
             }
             currentBestMove = bestMove.Substring(9, 4);
 

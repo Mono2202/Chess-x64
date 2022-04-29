@@ -1,367 +1,359 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
-
-public class Board : MonoBehaviour
+﻿namespace Chess
 {
-    // Fields:
-    private Communicator communicator;
-    private Communicator listener;
-    public GameObject cell;
-    public Transform canvas;
-    public List<Sprite> chessSprites = new List<Sprite>();
-    public Button returnButton;
-    public GameObject returnButtonSignResign;
-    public GameObject returnButtonSignLeave;
-    public Text returnButtonText;
-    public GameObject popupWindow;
-    public Text whiteUsername;
-    public Text blackUsername;
-    [HideInInspector] public GameObject[,] guiBoardArr = new GameObject[BOARD_SIZE, BOARD_SIZE];
-    [HideInInspector] public Piece[,] boardArr = new Piece[BOARD_SIZE, BOARD_SIZE];
-    [HideInInspector] public string currentMove;
-    [HideInInspector] public Position selectedPiece;
-    [HideInInspector] public Position selectedDest;
-    [HideInInspector] public bool isPlayerWhite;
-    [HideInInspector] public bool isCurrentPlayerWhite;
-    [HideInInspector] public string playerMove;
-    [HideInInspector] public bool gameOver = false;
-    [HideInInspector] public bool gameOverBoard = false;
-    [HideInInspector] public bool updateBoardFlag = false;
-    [HideInInspector] public string status = "";
-    [HideInInspector] public Color32 titleColor;
-    [HideInInspector] public Color32 textColor;
-    [HideInInspector] public Thread tSubmitMove;
-    [HideInInspector] public Thread tGetState;
+    using System.Collections.Generic;
 
-    // Constants:
-    public const int BOARD_SIZE = 8;
-    public static char[,] INITIAL_BOARD =
+    public class Board
     {
-        { 'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r' },
-        { 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p' },
-        { '#', '#', '#', '#', '#', '#', '#', '#' },
-        { '#', '#', '#', '#', '#', '#', '#', '#' },
-        { '#', '#', '#', '#', '#', '#', '#', '#' },
-        { '#', '#', '#', '#', '#', '#', '#', '#' },
-        { 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P' },
-        { 'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R' }
-    };
+        // Constants:
+        public const int WHITE_INDEX = 0;
+        public const int BLACK_INDEX = 1;
+        const uint WHITE_CASTLE_KINGSIDE_MASK = 0b1111111111111110;
+        const uint WHITE_CASTLE_QUEENSIDE_MASK = 0b1111111111111101;
+        const uint BLACK_CASTLE_KINGSIDE_MASK = 0b1111111111111011;
+        const uint BLACK_CASTLE_QUEENSIDE_MASK = 0b1111111111110111;
+        const uint WHITE_CASTLE_MASK = WHITE_CASTLE_KINGSIDE_MASK & WHITE_CASTLE_QUEENSIDE_MASK;
+        const uint BLACK_CASTLE_MASK = BLACK_CASTLE_KINGSIDE_MASK & BLACK_CASTLE_QUEENSIDE_MASK;
 
-    public const int W_PAWN_SPRITE_INDEX = 0;
-    public const int W_KNIGHT_SPRITE_INDEX = 1;
-    public const int W_BISHOP_SPRITE_INDEX = 2;
-    public const int W_ROOK_SPRITE_INDEX = 3;
-    public const int W_QUEEN_SPRITE_INDEX = 4;
-    public const int W_KING_SPRITE_INDEX = 5;
-    public const int B_PAWN_SPRITE_INDEX = 6;
-    public const int B_KNIGHT_SPRITE_INDEX = 7;
-    public const int B_BISHOP_SPRITE_INDEX = 8;
-    public const int B_ROOK_SPRITE_INDEX = 9;
-    public const int B_QUEEN_SPRITE_INDEX = 10;
-    public const int B_KING_SPRITE_INDEX = 11;
+        // Fields:
+        public int[] square;            // Stored piece codes; Piece code is defined as piecetype | colour code
+        public bool whiteToMove;
+        public int colourToMove;
+        public int opponentColour;
+        public int colourToMoveIndex;
 
-    public static Dictionary<char, int> charToSpriteIndex = new Dictionary<char, int>
-    {
-        { 'P', W_PAWN_SPRITE_INDEX },
-        { 'N', W_KNIGHT_SPRITE_INDEX },
-        { 'B', W_BISHOP_SPRITE_INDEX },
-        { 'R', W_ROOK_SPRITE_INDEX },
-        { 'Q', W_QUEEN_SPRITE_INDEX },
-        { 'K', W_KING_SPRITE_INDEX },
-        { 'p', B_PAWN_SPRITE_INDEX },
-        { 'n', B_KNIGHT_SPRITE_INDEX },
-        { 'b', B_BISHOP_SPRITE_INDEX },
-        { 'r', B_ROOK_SPRITE_INDEX },
-        { 'q', B_QUEEN_SPRITE_INDEX },
-        { 'k', B_KING_SPRITE_INDEX }
-    };
+        Stack<uint> gameStateHistory;     // Bits 0-3   : store white and black kingside/queenside castling legality
+                                          // Bits 4-7   : store file of en-passant square
+                                          // Bits 8-13  : captured piece
+                                          // Bits 14-...: fifty move counter
+        public uint currentGameState;     // The current game state
+        public int plyCount;              // Total plies played in game
+        public int fiftyMoveCounter;      // Total plies since last pawn move or capture
+        public int[] kingSquare;          // Square of white and black king
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        // Inits:
-        communicator = Data.instance.communicator;
-        listener = Data.instance.listener;
-        listener.m_socket.Flush();
+        public PieceList[] rooks;         //
+        public PieceList[] bishops;       //
+        public PieceList[] queens;        // Piece 
+        public PieceList[] knights;       //     Lists
+        public PieceList[] pawns;         //
+        public PieceList[] allPieceLists; //
 
-        // Sending the get room state request:
-        communicator.Write(Serializer.SerializeRequest<GetRoomStateRequest>(new GetRoomStateRequest { }, Serializer.GET_ROOM_STATE_REQUEST));
-
-        // Deserializing the response:
-        GetRoomStateResponse response = Deserializer.DeserializeResponse<GetRoomStateResponse>(communicator.Read());
-        string[] startingColors = response.CurrentMove.Split(new string[] { "&&&" }, StringSplitOptions.None);
-
-        // Setting the board's fields:
-        isPlayerWhite = (startingColors[0] == Data.instance.username) ? true : false;
-        currentMove = response.CurrentMove;
-        isCurrentPlayerWhite = true;
-        playerMove = "";
-
-        // Setting the players:
-        whiteUsername.text = startingColors[0];
-        blackUsername.text = startingColors[2];
-
-        // Creating the chess board:
-        for (int i = 0; i < BOARD_SIZE; i++)
+        /*
+         * Get piece list
+         * Input : pieceType - the piece type
+         *         colorIndex - the color index
+         * Output: the piece list
+         */
+        PieceList GetPieceList(int pieceType, int colourIndex)
         {
-            for (int j = 0; j < BOARD_SIZE; j++)
-            {
-                // Adding the chess piece object to the array:
-                boardArr[i, j] = CreatePiece(INITIAL_BOARD[i, j], new Position(i, j));
-
-                // Adding the cell to the GUI board array:
-                guiBoardArr[i, j] = CreateCell(i, j, INITIAL_BOARD[i, j]);
-            }
+            return allPieceLists[colourIndex * 8 + pieceType];
         }
 
-        // Starting communication with server about game state:
-        tSubmitMove = new Thread(new ThreadStart(SubmitMove));
-        tGetState = new Thread(new ThreadStart(GetState));
-        tSubmitMove.Start();
-        tGetState.Start();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        // Condition: move was played
-        if (selectedPiece != null && selectedDest != null && playerMove == "" && !gameOverBoard)
+        /*
+         * Making a move
+         * Input : move - the move
+         * Output: < None >
+         */
+        public void MakeMove(Move move)
         {
-            if (boardArr[selectedPiece.row, selectedPiece.col].GetLegalMoves(boardArr, currentMove).Any(move => (move.Value != null && move.Value.row == selectedDest.row && move.Value.col == selectedDest.col)))
+            // Inits:
+            uint oldEnPassantFile = (currentGameState >> 4) & 15;
+            uint originalCastleState = currentGameState & 15;
+            uint newCastleState = originalCastleState;
+            currentGameState = 0;
+
+            int opponentColourIndex = 1 - colourToMoveIndex;
+            int moveFrom = move.StartSquare;
+            int moveTo = move.TargetSquare;
+
+            int capturedPieceType = Piece.PieceType(square[moveTo]);
+            currentGameState |= (ushort)(capturedPieceType << 8);
+            int movePiece = square[moveFrom];
+            int pieceOnTargetSquare = movePiece;
+            int movePieceType = Piece.PieceType(movePiece);
+
+            int moveFlag = move.MoveFlag;
+            bool isPromotion = move.IsPromotion;
+            bool isEnPassant = moveFlag == Move.Flag.EN_PASSANT_CAPTURE;
+
+            // Handle captures:
+            if (capturedPieceType != 0 && !isEnPassant)
             {
-                // Changing the player move:
-                playerMove = Position.MoveToNotation(boardArr[selectedPiece.row, selectedPiece.col].type, selectedPiece, selectedDest, false, boardArr);
-
-                // Updating the current move:
-                currentMove = playerMove;
-
-                // Updating the board:
-                UpdateBoard(selectedPiece, selectedDest);
+                GetPieceList(capturedPieceType, opponentColourIndex).RemovePieceAtSquare(moveTo);
             }
 
-            // Resetting the properties:
-            selectedPiece = null;
-            selectedDest = null;
-        }
-
-        // Condition: board needs to be updated
-        if (updateBoardFlag)
-        {
-            // Resetting the flag:
-            updateBoardFlag = false;
-
-            // Updating the board:
-            UpdateBoard(new Position(currentMove[2] - '1', currentMove[1] - 'a'),
-                new Position(currentMove[4] - '1', currentMove[3] - 'a'));
-        }
-
-        // Condition: game is over
-        if (gameOver)
-        {
-            gameOver = false;
-            GameOver();
-        }
-    }
-
-    private void SubmitMove()
-    {
-        while (true)
-        {
-            // Condition: current player playes
-            if (isCurrentPlayerWhite == isPlayerWhite && playerMove != "")
+            // Condition: king moved
+            if (movePieceType == Piece.KING)
             {
-                // Sending the submit move request:
-                communicator.Write(Serializer.SerializeRequest<SubmitMoveRequest>(new SubmitMoveRequest { Move = playerMove }, Serializer.SUBMIT_MOVE_REQUEST));
+                kingSquare[colourToMoveIndex] = moveTo;
 
-                // Reading the response:
-                string msg = communicator.Read();
+                // Keeping castle state:
+                newCastleState &= (whiteToMove) ? WHITE_CASTLE_MASK : BLACK_CASTLE_MASK;
+            }
 
-                // Condition: game ended with win
-                if (playerMove.Contains("#"))
+            // Condition: other piece moved
+            else
+            {
+                GetPieceList(movePieceType, colourToMoveIndex).MovePiece(moveFrom, moveTo);
+            }
+
+            // Handle promotion:
+            if (isPromotion)
+            {
+                // Inits:
+                int promoteType = 0;
+
+                // Getting the correct promote type:
+                switch (moveFlag)
                 {
-                    gameOver = true;
-                    gameOverBoard = true;
-                    status = "Win";
-                    titleColor = new Color32(8, 171, 0, 255);
-                    textColor = new Color32(8, 171, 0, 255);
-                    return;
+                    case Move.Flag.PROMOTE_TO_QUEEN:
+                        promoteType = Piece.QUEEN;
+                        queens[colourToMoveIndex].AddPieceAtSquare(moveTo);
+                        break;
+
+                    case Move.Flag.PROMOTE_TO_ROOK:
+                        promoteType = Piece.ROOK;
+                        rooks[colourToMoveIndex].AddPieceAtSquare(moveTo);
+                        break;
+
+                    case Move.Flag.PROMOTE_TO_BISHOP:
+                        promoteType = Piece.BISHOP;
+                        bishops[colourToMoveIndex].AddPieceAtSquare(moveTo);
+                        break;
+
+                    case Move.Flag.PROMOTE_TO_KNIGHT:
+                        promoteType = Piece.KNIGHT;
+                        knights[colourToMoveIndex].AddPieceAtSquare(moveTo);
+                        break;
                 }
 
-                // Condition: game ended with tie
-                else if (playerMove.Contains("%"))
+                // Setting the promoted piece:
+                pieceOnTargetSquare = promoteType | colourToMove;
+
+                // Removing the promoted pawn from the square:
+                pawns[colourToMoveIndex].RemovePieceAtSquare(moveTo);
+            }
+
+            else
+            {
+                // Handle other special moves:
+                switch (moveFlag)
                 {
-                    gameOver = true;
-                    gameOverBoard = true;
-                    status = "Tie";
-                    titleColor = new Color32(8, 171, 0, 255);
-                    textColor = new Color32(8, 171, 0, 255);
-                    return;
+                    // Condition: handle en-passant
+                    case Move.Flag.EN_PASSANT_CAPTURE:
+
+                        // Choosing the target square:
+                        int enPassantPawnSquare = moveTo + ((colourToMove == Piece.WHITE) ? -8 : 8);
+
+                        // Setting the en-passant square:
+                        currentGameState |= (ushort)(square[enPassantPawnSquare] << 8);
+
+                        // Clearing the en-passant square:
+                        square[enPassantPawnSquare] = 0;
+                        pawns[opponentColourIndex].RemovePieceAtSquare(enPassantPawnSquare);
+                        break;
+
+                    // Condition: handle castling
+                    case Move.Flag.CASTLING:
+
+                        // Checking which side to castle:
+                        bool kingside = moveTo == BoardRepresentation.g1 || moveTo == BoardRepresentation.g8;
+                        int castlingRookFromIndex = (kingside) ? moveTo + 1 : moveTo - 2;
+                        int castlingRookToIndex = (kingside) ? moveTo - 1 : moveTo + 1;
+
+                        // Updating the board:
+                        square[castlingRookFromIndex] = Piece.NONE;
+                        square[castlingRookToIndex] = Piece.ROOK | colourToMove;
+                        rooks[colourToMoveIndex].MovePiece(castlingRookFromIndex, castlingRookToIndex);
+                        break;
                 }
-
-                // Resetting the player's move:
-                playerMove = "";
-
-                // Switching players:
-                isCurrentPlayerWhite = !isCurrentPlayerWhite;
             }
-        }
-    }
 
-    private void GetState()
-    {
-        while (true)
-        {
-            // Deserializing the response:
-            GetRoomStateResponse response = Deserializer.DeserializeResponse<GetRoomStateResponse>(listener.Read());
-            
-            // Switching players:
-            isCurrentPlayerWhite = !isCurrentPlayerWhite;
+            // Update the board representation:
+            square[moveTo] = pieceOnTargetSquare;
+            square[moveFrom] = 0;
 
-            // Updating the current move:
-            currentMove = response.CurrentMove;
-
-            // Condition: game ended with lose
-            if (currentMove.Contains("#"))
+            // Pawn has moved two forwards, mark file with en-passant flag:
+            if (moveFlag == Move.Flag.PAWN_TWO_FORWARD)
             {
-                gameOver = true;
-                gameOverBoard = true;
-                status = "Lose";
-                titleColor = new Color32(240, 41, 41, 255);
-                textColor = new Color32(240, 41, 41, 255);
-                return;
+                int file = BoardRepresentation.FileIndex(moveFrom) + 1;
+                currentGameState |= (ushort)(file << 4);
             }
 
-            // Condition: game ended with tie
-            else if (currentMove.Contains("%"))
+            // Piece moving to/from rook square removes castling right for that side:
+            if (originalCastleState != 0)
             {
-                gameOver = true;
-                gameOverBoard = true;
-                status = "Tie";
-                titleColor = new Color32(8, 171, 0, 255);
-                textColor = new Color32(8, 171, 0, 255);
-                return;
+                if (moveTo == BoardRepresentation.h1 || moveFrom == BoardRepresentation.h1)
+                {
+                    newCastleState &= WHITE_CASTLE_KINGSIDE_MASK;
+                }
+                else if (moveTo == BoardRepresentation.a1 || moveFrom == BoardRepresentation.a1)
+                {
+                    newCastleState &= WHITE_CASTLE_QUEENSIDE_MASK;
+                }
+                if (moveTo == BoardRepresentation.h8 || moveFrom == BoardRepresentation.h8)
+                {
+                    newCastleState &= BLACK_CASTLE_KINGSIDE_MASK;
+                }
+                else if (moveTo == BoardRepresentation.a8 || moveFrom == BoardRepresentation.a8)
+                {
+                    newCastleState &= BLACK_CASTLE_QUEENSIDE_MASK;
+                }
             }
 
-            // Condition: game ended with win
-            else if (currentMove.Contains("OPPONENT LEFT"))
+            // Updating the current game state:
+            currentGameState |= newCastleState;
+            currentGameState |= (uint)fiftyMoveCounter << 14;
+
+            // Pushing the current game state to the game state history:
+            gameStateHistory.Push(currentGameState);
+
+            // Change side to move:
+            whiteToMove = !whiteToMove;
+            colourToMove = (whiteToMove) ? Piece.WHITE : Piece.BLACK;
+            opponentColour = (whiteToMove) ? Piece.BLACK : Piece.WHITE;
+            colourToMoveIndex = 1 - colourToMoveIndex;
+
+            // Raising move counters:
+            plyCount++;
+            fiftyMoveCounter++;
+        }
+
+        /*
+         * Loading the start position
+         * Input : < None >
+         * Output: < None >
+         */
+        public void LoadStartPosition()
+        {
+            LoadPosition(FenUtility.START_FEN);
+        }
+
+        /*
+         * Loading custom position from FEN string
+         * Input : fen - the FEN string
+         * Output: < None >
+         */
+        public void LoadPosition(string fen)
+        {
+            // Inits:
+            Initialize();
+            var loadedPosition = FenUtility.PositionFromFen(fen);
+
+            // Load pieces into board array and piece lists:
+            for (int squareIndex = 0; squareIndex < 64; squareIndex++)
             {
-                gameOver = true;
-                gameOverBoard = true;
-                status = "Win";
-                titleColor = new Color32(8, 171, 0, 255);
-                textColor = new Color32(8, 171, 0, 255);
-                return;
+                // Inits:
+                int piece = loadedPosition.squares[squareIndex];
+                square[squareIndex] = piece;
+
+                // Condition: piece exists
+                if (piece != Piece.NONE)
+                {
+                    // Getting the piece type and color:
+                    int pieceType = Piece.PieceType(piece);
+                    int pieceColourIndex = (Piece.IsColour(piece, Piece.WHITE)) ? WHITE_INDEX : BLACK_INDEX;
+
+                    // Condition: piece is a sliding piece
+                    if (Piece.IsSlidingPiece(piece))
+                    {
+                        // Condition: piece is a queen
+                        if (pieceType == Piece.QUEEN)
+                        {
+                            queens[pieceColourIndex].AddPieceAtSquare(squareIndex);
+                        }
+
+                        // Condition: piece is a rook
+                        else if (pieceType == Piece.ROOK)
+                        {
+                            rooks[pieceColourIndex].AddPieceAtSquare(squareIndex);
+                        }
+
+                        // Condition: piece is a bishop
+                        else if (pieceType == Piece.BISHOP)
+                        {
+                            bishops[pieceColourIndex].AddPieceAtSquare(squareIndex);
+                        }
+                    }
+
+                    // Condition: piece is a knight
+                    else if (pieceType == Piece.KNIGHT)
+                    {
+                        knights[pieceColourIndex].AddPieceAtSquare(squareIndex);
+                    }
+
+                    // Condition: piece is a pawn
+                    else if (pieceType == Piece.PAWN)
+                    {
+                        pawns[pieceColourIndex].AddPieceAtSquare(squareIndex);
+                    }
+
+                    // Condition: piece is a king
+                    else if (pieceType == Piece.KING)
+                    {
+                        kingSquare[pieceColourIndex] = squareIndex;
+                    }
+                }
             }
 
-            // Setting the update board flag:
-            updateBoardFlag = true;
-        }
-    }
+            // Setting color to move:
+            whiteToMove = loadedPosition.whiteToMove;
+            colourToMove = (whiteToMove) ? Piece.WHITE : Piece.BLACK;
+            opponentColour = (whiteToMove) ? Piece.BLACK : Piece.WHITE;
+            colourToMoveIndex = (whiteToMove) ? 0 : 1;
 
-    private Piece CreatePiece(char type, Position position)
-    {
-        switch (Char.ToUpper(type))
+            // Creating the gamestate:
+            int whiteCastle = ((loadedPosition.whiteCastleKingside) ? 1 << 0 : 0) | ((loadedPosition.whiteCastleQueenside) ? 1 << 1 : 0);
+            int blackCastle = ((loadedPosition.blackCastleKingside) ? 1 << 2 : 0) | ((loadedPosition.blackCastleQueenside) ? 1 << 3 : 0);
+            int enPassantState = loadedPosition.enPassantFile << 4;
+            ushort initialGameState = (ushort)(whiteCastle | blackCastle | enPassantState);
+            currentGameState = initialGameState;
+
+            // Adding to the game history:
+            gameStateHistory.Push(initialGameState);
+
+            // Setting the plies count:
+            plyCount = loadedPosition.plyCount;
+        }
+
+        /*
+         * Initialize board
+         * Input : < None >
+         * Output: < None >
+         */
+        void Initialize()
         {
-            case 'P': return new Pawn(type, position);
-            case 'N': return new Knight(type, position);
-            case 'B': return new Bishop(type, position);
-            case 'R': return new Rook(type, position);
-            case 'Q': return new Queen(type, position);
-            case 'K': return new King(type, position);
-            default: return null;
+            // Inits:
+            square = new int[64];
+            kingSquare = new int[2];
+            gameStateHistory = new Stack<uint>();
+            plyCount = 0;
+            fiftyMoveCounter = 0;
+
+            knights = new PieceList[] { new PieceList(10), new PieceList(10) };
+            pawns = new PieceList[] { new PieceList(8), new PieceList(8) };
+            rooks = new PieceList[] { new PieceList(10), new PieceList(10) };
+            bishops = new PieceList[] { new PieceList(10), new PieceList(10) };
+            queens = new PieceList[] { new PieceList(9), new PieceList(9) };
+            PieceList emptyList = new PieceList(0);
+
+            allPieceLists = new PieceList[] {
+                emptyList,
+                emptyList,
+                pawns[WHITE_INDEX],
+                knights[WHITE_INDEX],
+                emptyList,
+                bishops[WHITE_INDEX],
+                rooks[WHITE_INDEX],
+                queens[WHITE_INDEX],
+                emptyList,
+                emptyList,
+                pawns[BLACK_INDEX],
+                knights[BLACK_INDEX],
+                emptyList,
+                bishops[BLACK_INDEX],
+                rooks[BLACK_INDEX],
+                queens[BLACK_INDEX],
+            };
         }
-    }
-
-    private GameObject CreateCell(int i, int j, char type)
-    {
-        // Creating the cell game object:
-        GameObject currentCell = Instantiate(cell);
-
-        // Changing the cell's color: TODO
-        //currentCell.GetComponent<Image>().color = (((i + j) % 2 == 0) /*== Data.instance.isWhite*/) ? new Color32(65, 65, 65, 255) : new Color32(8, 171, 0, 255);
-        currentCell.GetComponent<Image>().color = (((i + j) % 2 == 0) /*== Data.instance.isWhite*/) ? Data.instance.whiteSquareColor : Data.instance.blackSquareColor;
-
-        // Changing the cell's parent:
-        currentCell.transform.SetParent(canvas, false);
-
-        // Positioning the cell:
-        currentCell.transform.localPosition = new Vector3(-350 / 2 + j * 50, 350 / 2 - i * 50, 0); // TODO: TURN TO CONSTANTS
-
-        // Creating the chess sprite game object:
-        GameObject chessSprite = new GameObject();
-        chessSprite.AddComponent<Image>();
-
-        // Condition: piece in current cell
-        if (type != '#')
-        {
-            // Assigning the sprite to the game object:
-            chessSprite.GetComponent<Image>().sprite = chessSprites[charToSpriteIndex[type]];
-            chessSprite.GetComponent<Image>().rectTransform.sizeDelta = new Vector2(45, 45);
-        }
-
-        else
-        {
-            // Hiding the empty sprite:
-            chessSprite.GetComponent<Image>().enabled = false;
-        }
-
-        // Assigning the sprite to the cell:
-        chessSprite.transform.SetParent(currentCell.transform, false);
-
-        // Adding option to click on cell:
-        currentCell.GetComponent<CellClick>().row = i;
-        currentCell.GetComponent<CellClick>().col = j;
-        currentCell.GetComponent<CellClick>().boardScript = this;
-
-        return currentCell;
-    }
-
-    private void UpdateBoard(Position src, Position dst)
-    {
-        // Changing the GUI:
-        Destroy(guiBoardArr[dst.row, dst.col]);
-        guiBoardArr[dst.row, dst.col] = CreateCell(dst.row, dst.col,
-            boardArr[src.row, src.col].type);
-        Destroy(guiBoardArr[src.row, src.col]);
-        guiBoardArr[src.row, src.col] = CreateCell(src.row, src.col, '#');
-
-        // Changing the board array:
-        boardArr[dst.row, dst.col] = boardArr[src.row, src.col];
-        boardArr[dst.row, dst.col].position = new Position(dst.row, dst.col);
-        boardArr[src.row, src.col] = null;
-    }
-
-    public void ReturnToMenu()
-    {
-        // Aborting the threads:
-        tSubmitMove.Abort();
-        tGetState.Abort();
-
-        // Sending the leave room request:
-        communicator.Write(Serializer.SerializeRequest<LeaveRoomRequest>(new LeaveRoomRequest { }, Serializer.LEAVE_ROOM_REQUEST));
-
-        // Reading the message:
-        string msg = communicator.Read();
-
-        // Switching to the menu scene:
-        this.GetComponent<SwitchScene>().SwitchSceneByIndex(Data.HOME_SCENE_COUNT);
-    }
-
-    private void GameOver()
-    {
-        // Opening the popup window:
-        popupWindow.GetComponent<PopupWindow>().SetProperties("Results", status, titleColor, textColor);
-        popupWindow.SetActive(true);
-
-        // Assigning the exit button labels:
-        returnButtonSignResign.SetActive(false);
-        returnButtonSignLeave.SetActive(true);
-        returnButtonText.text = "Leave";
     }
 }
