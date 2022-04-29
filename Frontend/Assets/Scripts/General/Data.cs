@@ -36,7 +36,10 @@ public class Data : MonoBehaviour
     private const int PORT_INDEX = 1;
     private const int LISTENER_PORT_INDEX = 2;
 
-    // Methods:
+    
+    /*
+     * Runs when object is created
+     */
     private void Awake()
     {
         // Inits:
@@ -58,18 +61,6 @@ public class Data : MonoBehaviour
         instance.communicator = new Communicator(ip, port);
         instance.listener = new Communicator(ip, listenerPort);
 
-        // Condition: not first session
-        if (false) // TODO: CHANGE TO DB SETTINGS
-        {
-            LoadUserPrefrences();
-        }
-
-        // Condition: first session
-        else
-        {
-            ResetSquareColors();
-        }
-
         // Keeping the prefab loaded at all times:
         DontDestroyOnLoad(gameObject);
 
@@ -77,22 +68,22 @@ public class Data : MonoBehaviour
         SceneManager.LoadScene(LOGIN_SCENE_INDEX);
     }
 
+    /*
+     * Runs when program quits
+     */
     void OnApplicationQuit()
     {
+        // Sending exit message to server:
         instance.communicator.Write("EXIT");
     }
 
-    public void LoadUserPrefrences()
-    {
-    }
-
-    public void ResetSquareColors()
-    {
-        // Setting the square colors:
-        instance.whiteSquareColor = new Color32(255, 255, 255, 255);
-        instance.blackSquareColor = new Color32(65, 65, 65, 255);
-    }
-
+    /*
+     * Reading the config file
+     * Input : ip           - the refrence to the ip string
+     *         port         - the refrence to the port string
+     *         listenerPort - the refrence to the listenerPort string
+     * Output: < None >
+     */
     private void ReadConfig(ref string ip, ref int port, ref int listenerPort)
     {
         // Inits:

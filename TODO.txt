@@ -102,3 +102,4 @@
 - REMOVE CHESS.COM LOGO FROM HOME SCREEN GIF
 - MAKE BOARD EDITOR WITH MORE FEATURES
 - CHANGE DEPTH BY USER
+- add user prefrences and settings to change colors

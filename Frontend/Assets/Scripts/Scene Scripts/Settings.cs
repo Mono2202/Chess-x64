@@ -53,10 +53,4 @@ public class Settings : MonoBehaviour
         Data.instance.blackSquareColor = new Color32(Convert.ToByte(rBlack.text),
             Convert.ToByte(gBlack.text), Convert.ToByte(bBlack.text), Convert.ToByte(aBlack.text));
     }
-
-    public void ResetColors()
-    {
-        // Resetting the square's colors:
-        Data.instance.ResetSquareColors();
-    }
 }
