@@ -133,11 +133,11 @@
   -port:54321
   -listenerPort:12345
   ```
-4. Open ```Backend/Backend/Backend.sln``` in Visual Studio 2022 Preview
-5. Run the server
-6. Open ```Frontend``` folder in Unity
-7. Build the client by pressing ```CTRL + B```
-8. From the ```Builds``` folder, start multiple Clients (```.exe``` file)
+3. Open ```Backend/Backend/Backend.sln``` in Visual Studio 2022 Preview
+4. Run the server
+5. Open ```Frontend``` folder in Unity
+6. Build the client by pressing ```CTRL + B```
+7. From the ```Builds``` folder, start multiple Clients (```.exe``` file)
 
 
 
