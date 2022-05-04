@@ -87,12 +87,17 @@
 <!-- BUILT WITH -->
 <h2 id="built-with"> 🐫 Built With</h2>
 
-* [Unity](https://unity.com/)
-* [C++](https://www.cplusplus.com/)
-* [Python](https://www.python.org/) 
-* [SQLite](https://www.sqlite.org/index.html)
+Backend:
+* [C++](https://isocpp.org/)
+* [C](https://www.gnu.org/software/gnu-c-manual/)
+* [Python](https://www.python.org/)
+* [SQLite3](https://www.sqlite.org/index.html)
 * [nlohmann/json](https://github.com/nlohmann/json)
 
+Frontend:
+* [C#](https://docs.microsoft.com/en-us/dotnet/csharp/)
+* [WPF](https://docs.microsoft.com/en-us/dotnet/desktop/wpf/?view=netdesktop-5.0)
+* [Newtonsoft.Json](https://www.newtonsoft.com/json)
 
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
