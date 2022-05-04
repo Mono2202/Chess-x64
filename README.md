@@ -1,4 +1,4 @@
-<h1 align="center"> Chess x64 </h1>
+<h1 align="center"> Chess x64 ♟️</h1>
 
 <p align="center"> 
   <img src="https://user-images.githubusercontent.com/69368659/166502144-59a33aca-6eea-4890-9f75-385fd6f3441c.png" alt="Chess x64 Logo" height="300" width="300">
