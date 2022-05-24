@@ -23,7 +23,6 @@ public class MatchHistory : MonoBehaviour
 
         // Deserializing the response:
         string msg = communicator.Read();
-        print(msg);
         GetMatchHistoryResponse response = Deserializer.DeserializeResponse<GetMatchHistoryResponse>(msg);
         games = response.Games.Split(new string[] { "@@" }, StringSplitOptions.None);
 

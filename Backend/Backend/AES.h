@@ -12,7 +12,7 @@
 #include <sstream>
 
 // Defines:
-#define SIZE 4096
+#define SIZE 10000
 
 // Using:
 using std::string;

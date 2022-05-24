@@ -27,7 +27,7 @@ public class MatchPrefab : MonoBehaviour
         whiteUsernameText.text = whiteUsername;
         blackUsernameText.text = blackUsername;
         dateText.text = date;
-        Debug.Log(wonUsername);
+        
         // Condition: tie
         if (wonUsername == "!TIE!")
         {

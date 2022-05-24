@@ -9,6 +9,15 @@ Output: result  - the encrypted message
 */
 Buffer AES::encrypt(Buffer& message)
 {
+	// Condition: get match history response
+	if (message[0] == 117)
+	{
+		// Converting to binary:
+		string data(message.begin(), message.end());
+		string result = textToBinaryString(data);
+		return Buffer(result.begin(), result.end());
+	}
+
 	// Converting " to ^:
 	for (int i = 0; i < message.size(); i++) {
 		if (message[i] == '\"') {

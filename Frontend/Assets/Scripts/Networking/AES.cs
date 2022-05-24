@@ -96,7 +96,12 @@ public class AES
             list.Add(Convert.ToByte(t, 2));
         }
         cipher = Encoding.ASCII.GetString(list.ToArray());
-        Debug.Log(1);
+
+        // Condition: get match history response
+        if (cipher[0] == 'u' && cipher[1] == '{')
+        {
+            return cipher;
+        }
 
         // Converting hex string to byte array:
         string[] hexValuesSplit = cipher.Split('-');
@@ -112,7 +117,7 @@ public class AES
             int value = Convert.ToInt32(hexValuesSplit[i], 16);
             byteValues[i] = (byte)value;
         }
-        Debug.Log(2);
+        
         // Inits:
         ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
         string data = "";
@@ -124,13 +129,11 @@ public class AES
             {
                 using (StreamReader reader = new StreamReader(cs))
                 {
-                    Debug.Log(2.5);
                     data = reader.ReadToEnd();
-                    Debug.Log(2.7);
                 }
             }
         }
-        Debug.Log(3);
+
         // Converting ^ to ":
         string newData = "";
         for (int i = 0; i < data.Length; i++)
@@ -145,7 +148,6 @@ public class AES
                 newData += data[i];
             }
         }
-        Debug.Log(4);
         return newData;
     }
 }

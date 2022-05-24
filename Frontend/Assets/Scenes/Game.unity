@@ -886,7 +886,7 @@ GameObject:
   - component: {fileID: 1033237248}
   - component: {fileID: 1033237247}
   m_Layer: 5
-  m_Name: Label (1)
+  m_Name: MoveHistoryLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -944,7 +944,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: MOVE HISTORY GOES HERE
+  m_Text: 
 --- !u!222 &1033237248
 CanvasRenderer:
   m_ObjectHideFlags: 0

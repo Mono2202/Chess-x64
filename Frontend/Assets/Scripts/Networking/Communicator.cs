@@ -11,7 +11,7 @@ public class Communicator
     private AES m_aes;
 
     // Constants:
-    const int SIZE = 4096;
+    const int SIZE = 100000;
 
     /*
      * C'tor
@@ -73,9 +73,9 @@ public class Communicator
             return m_aes.AESDecrypt(data);
         }
 
-        catch
+        catch (Exception ex)
         {
-            Debug.Log("Error: no connection with server");
+            Debug.Log(ex.Message);
             return "";
         }
     }

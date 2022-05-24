@@ -123,6 +123,7 @@ class Deserializer
     public static T DeserializeResponse<T>(string buffer)
     {
         // Building the response:
+        Debug.Log(buffer);
         return JsonConvert.DeserializeObject<T>(buffer.Substring(1));
     }
 }
