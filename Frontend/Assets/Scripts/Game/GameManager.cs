@@ -134,6 +134,15 @@ namespace Chess.Game
                     status = "Game Won";
                     GameOver();
                 }
+
+                // Condition: stalemate
+                if (gameResult == Result.Stalemate)
+                {
+                    titleColor = new Color32(220, 255, 0, 255);
+                    textColor = new Color32(220, 255, 0, 255);
+                    status = "Stalemate";
+                    GameOver();
+                }
             }
         }
 
@@ -281,6 +290,12 @@ namespace Chess.Game
                 {
                     gameResult = Result.OpponentResigned;
                     return;
+                }
+
+                // Condition: stalemate
+                else if (response.CurrentMove == "TIE")
+                {
+                    gameResult = Result.Stalemate;
                 }
 
                 // Updating the current move:

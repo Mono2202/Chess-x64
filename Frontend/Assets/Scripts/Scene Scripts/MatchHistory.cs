@@ -22,7 +22,9 @@ public class MatchHistory : MonoBehaviour
         communicator.Write(Serializer.SerializeRequest<GetMatchHistoryRequest>(new GetMatchHistoryRequest { Username = Data.instance.profileUsername }, Serializer.GET_MATCH_HISTORY_REQUEST));
 
         // Deserializing the response:
-        GetMatchHistoryResponse response = Deserializer.DeserializeResponse<GetMatchHistoryResponse>(communicator.Read());
+        string msg = communicator.Read();
+        print(msg);
+        GetMatchHistoryResponse response = Deserializer.DeserializeResponse<GetMatchHistoryResponse>(msg);
         games = response.Games.Split(new string[] { "@@" }, StringSplitOptions.None);
 
         // Assigning the labels:
@@ -38,7 +40,7 @@ public class MatchHistory : MonoBehaviour
                 currentMatch.transform.SetParent(content.transform, false);
                 currentMatch.transform.localPosition = new Vector3(0, 140 - i * 100, 0);
                 currentMatch.GetComponent<MatchPrefab>().SetPrefab(currentGame[0],
-                    currentGame[1], currentGame[2], currentGame[3], currentGame[4]);
+                    currentGame[1], currentGame[2], currentGame[3]);
             }
         }
     }

@@ -16,20 +16,18 @@ public class MatchPrefab : MonoBehaviour
      * Setting the prefab's properties
      * Input : whiteUsername - the white player's username
      *         blackUsername - the black player's username
-     *         game          - the game string
      *         wonUsername   - the winning player's username
      *         date          - the date the game took place
      * Output: < None >
      */
-    public void SetPrefab(string whiteUsername, string blackUsername, string game,
+    public void SetPrefab(string whiteUsername, string blackUsername,
         string wonUsername, string date)
     {
         // Setting the labels:
         whiteUsernameText.text = whiteUsername;
         blackUsernameText.text = blackUsername;
-        gameText.text = game;
         dateText.text = date;
-
+        Debug.Log(wonUsername);
         // Condition: tie
         if (wonUsername == "!TIE!")
         {

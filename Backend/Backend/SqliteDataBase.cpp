@@ -440,7 +440,7 @@ int SqliteDatabase::gamesCallback(void* data, int argc, char** argv, char** azCo
 
 	// Adding current game:
 	if (argc > 0) {
-		games->push_back(std::string(argv[0]) + "&&&" + std::string(argv[1]) + "&&&" + std::string(argv[2]) + "&&&" + std::string(argv[3]) +
+		games->push_back(std::string(argv[0]) + "&&&" + std::string(argv[1]) + "&&&" + std::string(argv[3]) +
 			"&&&" + std::string(argv[4]));
 	}
 
